@@ -1,0 +1,157 @@
+---
+title: "explore"
+author: "emchasen"
+date: "2022-08-26"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+This is where I examine the relationships between my explanatory variables and yield.
+
+```{r}
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(DALEXtra)
+library(tidymodels)
+library(randomForest)
+# load data
+grassData <- read_csv("output/cropData.csv")
+summary(grassData)
+grass <- grassData %>%
+  mutate(cropname = recode(cropname, 
+                           `Bluegrass-white clover`="Bluegrass-clover",
+                           `Orchardgrass-alsike`= "Orchardgrass-clover",
+                           `Orchardgrass-red clover` = "Orchardgrass-clover",
+                           `Timothy-alsike` = "Timothy-clover")) %>%
+  mutate_if(is.character, as.factor) %>%
+  dplyr::select(c(cropname, yield = nonirryield.r, slope, elev, sand, silt,
+                  clay, om, ksat, cec, ph, awc, total.depth)) %>%
+  filter(yield < 10) 
+#load model
+mod <- readRDS("output/grass_pred.rds")
+```
+
+
+## Model explainer
+
+```{r}
+grassx <- grass %>%
+  dplyr::select(-c(yield))
+
+full_explainer <- 
+  explain_tidymodels(
+    mod, 
+    data = grassx, 
+    y = grass$yield,
+    label = "random forest",
+    verbose = FALSE
+  )
+
+(eva_rf <- DALEX::model_performance(full_explainer))
+plot(eva_rf, geom = "histogram") 
+```
+
+## Variable importance
+
+```{r}
+set.seed(1804)
+vip_rf <- model_parts(full_explainer, loss_function = loss_root_mean_square)
+
+obj <- list(vip_rf)
+metric_name <- attr(obj[[1]], "loss_name")
+metric_lab <- paste(metric_name, 
+                    "after permutations\n(higher indicates more important)")
+
+
+full_vip <- vip_rf %>%
+  filter(variable != "_baseline_") %>%
+  dplyr::select(-c(label))
+
+perm_vals <- full_vip %>% 
+  filter(variable == "_full_model_") %>% 
+  summarise(dropout_loss = mean(dropout_loss))
+
+full_vip %>%
+  filter(variable != "_full_model_") %>% 
+  mutate(variable = str_to_sentence(variable),
+         variable = fct_reorder(variable, dropout_loss),
+         variable = recode(variable,
+                           "Cropname" = "Grass species",
+                           "Awc" = "AWC",
+                           "Ph" = "pH",
+                           "Om" = "OM",
+                           "Elev" = "Elevation",
+                           "Total.depth" = "Soil depth")) %>%
+  ggplot(aes(dropout_loss, variable))  +
+  geom_boxplot(fill = "#91CBD765") +
+  labs(x = "Root mean square error (RMSE) loss", 
+       y = NULL,  fill = NULL,  color = NULL)
+
+```
+
+## Partial dependence plots
+
+### Species
+
+```{r}
+pdp_species <- model_profile(
+  full_explainer,
+  variables = "cropname",
+  N = NULL
+)
+
+plot(pdp_species)
+```
+
+### Ksat
+
+```{r}
+pdp_ksat <- model_profile(
+  full_explainer,
+  variables = "ksat",
+  N = NULL
+)
+
+plot(pdp_ksat)
+```
+ 
+### AWC
+
+```{r}
+pdp_awc <- model_profile(
+  full_explainer,
+  variables = "awc",
+  N = NULL
+)
+
+plot(pdp_awc)
+```
+
+###Sand
+
+```{r}
+pdp_sand <- model_profile(
+  full_explainer,
+  variables = "sand",
+  N = NULL
+)
+
+plot(pdp_sand)
+```
+
+###Slope
+
+```{r}
+pdp_slope <- model_profile(
+  full_explainer,
+  variables = "slope",
+  N = NULL
+)
+
+plot(pdp_slope)
+```
+

@@ -1,0 +1,110 @@
+---
+title: "createModel"
+author: "emchasen"
+date: "2022-08-24"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Use randomForest engine with the tidyverse to tune the model
+
+```{r}
+library(tidyverse) 
+library(tidymodels)
+library(randomForest)
+```
+
+# upload data from all of WI
+
+```{r}
+soil <- read.csv("output/cropdata.csv")
+summary(soil)
+levels(as.factor(soil$cropname))
+
+grass <- soil %>%
+  mutate(cropname = recode(cropname, 
+                           `Bluegrass-white clover`="Bluegrass-clover",
+                           `Orchardgrass-alsike`= "Orchardgrass-clover",
+                           `Orchardgrass-red clover` = "Orchardgrass-clover",
+                           `Timothy-alsike` = "Timothy-clover")) %>%
+  mutate_if(is.character, as.factor) %>%
+  dplyr::select(c(cropname, yield = nonirryield.r, slope, elev, sand, silt,
+                  clay, om, ksat, cec, ph, awc, total.depth)) %>%
+  filter(yield < 10) %>%
+  drop_na()
+summary(grass)
+
+```
+
+
+# begin training
+
+```{r}
+set.seed(123)
+split <- initial_split(grass, strata = yield, prop = 1/4) # small proportion for knit. usually 3/4
+train <- training(split)
+test <- testing(split)
+
+
+#recipe 
+grass_rec <- recipe(yield ~ ., data = train)
+
+grass_prep <- prep(grass_rec)
+juiced <- juice(grass_prep)
+
+tune_spec <- rand_forest(
+  mtry = tune(),
+  trees = tune(),
+  min_n = tune()
+) %>%
+  set_mode("regression") %>%
+  set_engine("randomForest")
+
+tune_wf <- workflow() %>%
+  add_recipe(grass_rec) %>%
+  add_model(tune_spec)
+
+# train hyperparameters
+set.seed(234)
+folds <- vfold_cv(train)
+
+doParallel::registerDoParallel()
+
+rf_grid <- grid_regular(
+  mtry(range = c(3, 8)),
+  min_n(range = c(3, 8)),
+  trees(range = c(50,75)),
+  levels = 3
+)
+
+set.seed(456)
+regular_res <- tune_grid(
+  tune_wf,
+  resamples = folds,
+  grid = rf_grid
+)
+
+#choose best model
+best_rmse <- select_best(regular_res, "rmse")
+
+best_rmse
+
+final_rf <- finalize_model(
+  tune_spec,
+  best_rmse
+)
+
+final_rf
+
+mod <- final_rf %>%
+  set_engine("randomForest", importance = TRUE) %>%
+  fit(yield ~ .,
+      data = train
+  )
+```
+
+# save model
+```{r}
+saveRDS(mod, "output/grass_pred.rds")
+```

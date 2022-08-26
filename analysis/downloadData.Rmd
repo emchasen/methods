@@ -1,0 +1,96 @@
+---
+title: "Download Data"
+author: "emchasen"
+date: "2022-01-24"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Load libraries
+
+The data needed for this analysis is stored in the SSURGO database. We used the R package FedData to download SSURGO data.
+
+```{r}
+library(FedData)
+```
+
+Download the data using the function get_ssurgo(). Give the argument 'template' the county area name, which are  'WI' + the county FIPS codes. However a few counties are joined together so it is helpful to reference the [Web Soil Survey](https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx). 
+```{r, eval=FALSE}
+Adams <- get_ssurgo(template = 'WI001', label = "Adams")
+Ashland <- get_ssurgo(template = 'WI003', label = "Ashland")
+Barron <- get_ssurgo(template= 'WI005', label='Barron')
+Bayfield <- get_ssurgo(template = "WI007", label = "Bayfield")
+Brown <- get_ssurgo(template= 'WI009', label='Brown')
+Buffalo <- get_ssurgo(template = 'WI011', label = "Buffalo")
+BurnettCounty <- get_ssurgo(template = 'WI013', label = "Burnett")
+# 015 is Calumet county and that is combined with Manitowoc in WI600
+Chippewa <- get_ssurgo(template= 'WI017', label='Chippewa')
+Clark <- get_ssurgo(template= 'WI019', label='Clark')
+Columbia <- get_ssurgo(template = 'WI021', label = "Columbia")
+Crawford <- get_ssurgo(template= 'WI023', label='Crawford')
+Dane <- get_ssurgo(template= 'WI025', label='Dane')
+Dodge <- get_ssurgo(template= 'WI027', label='Dodge')
+Door <- get_ssurgo(template = 'WI029', label = "Door")
+Douglas<- get_ssurgo(template = 'WI031', label = "Douglas")
+Dunn <- get_ssurgo(template =  'WI033', label = "Dunn")
+EauClaire <- get_ssurgo(template = 'WI035', label = "EauClaire")
+Florence <- get_ssurgo(template = 'WI037', label = "Florence")
+FondDuLac <- get_ssurgo(template= 'WI039', label='FondDuLac')
+Forest <- get_ssurgo(template = 'WI041', label = 'Forest')
+Grant <- get_ssurgo(template= 'WI043', label='Grant')
+Green <- get_ssurgo(template = 'WI045', label = "Green")
+GreenLake <- get_ssurgo(template = 'WI047', label = "GreenLake")
+Iowa <- get_ssurgo(template = 'WI049', label = "Iowa")
+Iron <- get_ssurgo(template = 'WI051', label = "Iron")
+Jackson <- get_ssurgo(template = 'WI053', label = "Jackson")
+Jefferson <- get_ssurgo(template = 'WI055', label = "Jefferson")
+Juneau <- get_ssurgo(template = 'WI057', label = "Juneau")
+# 059 is Kenosha and that is joined with Racine in WI601
+Kewaunee <- get_ssurgo(template= 'WI061', label='Kewaunee')
+Lacrosse <- get_ssurgo(template = 'WI063', label = "LaCrosse")
+Lafayette <- get_ssurgo(template= 'WI065', label='Lafayette')
+Langlade <- get_ssurgo(template = 'WI067', label = "Langlade")
+Lincoln <- get_ssurgo(template = 'WI069', label = "Lincoln")
+# 071 is Manitowoc and that is joined with Calumet in WI600
+Marathon <- get_ssurgo(template= 'WI073', label='Marathon')
+Marinette <- get_ssurgo(template = 'WI075', label = "Marinette")
+Marquette <- get_ssurgo(template = "WI077", label = "Marquette")
+Menominee<- get_ssurgo(template = 'WI078', label = "Menominee")
+# 079 is Milwaukee and that is joined with Waukesha in WI602
+Monroe <- get_ssurgo(template= 'WI081', label='Monroe')
+Oconto <- get_ssurgo(template = 'WI083', label = "Oconto")
+Oneida<- get_ssurgo(template = 'WI085', label = "Oneida")
+Outagamie <- get_ssurgo(template = "WI087", label = "Outagamie")
+Ozaukee <- get_ssurgo(template = "WI089", label = "Ozaukee")
+Pepin <- get_ssurgo(template = "WI091", label = "Pepin")
+Pierce <- get_ssurgo(template = "WI093", label = "Pierce")
+Polk <- get_ssurgo(template = "WI095", label = "Polk")
+Portage <- get_ssurgo(template = "WI097", label = "Portage")
+Price <- get_ssurgo(template = "WI099", label = "Price")
+# 101 is Racine and that is combined with Kenosha in WI601
+Richland <- get_ssurgo(template = "WI103", label = "Richland")
+Rock <- get_ssurgo(template = "WI105", label = "Rock")
+Rusk <- get_ssurgo(template = "WI107", label = "Rusk")
+StCroix <- get_ssurgo(template = "WI109", label = "StCroix")
+Sauk <- get_ssurgo(template = "WI111", label = "Sauk")
+Sawyer <- get_ssurgo(template = "WI113", label = "Sawyer")
+Shawano <- get_ssurgo(template= 'WI115', label='Shawano')
+Sheboygan <- get_ssurgo(template = "WI117", label = "Sheboygan")
+Taylor <- get_ssurgo(template= 'WI119', label='Taylor')
+Trempealeau <- get_ssurgo(template = "WI121", label = "Trempealeau")
+Vernon <- get_ssurgo(template= 'WI123', label='Vernon')
+Vilas <- get_ssurgo(template = "WI125", label = "Vilas")
+Walworth <- get_ssurgo(template = "WI127", label = "Walworth")
+Washburn <- get_ssurgo(template = "WI129", label = "Washburn")
+Washington <- get_ssurgo(template = "WI131", label = "Washington")
+Waupaca <- get_ssurgo(template = "WI135", label = "Waupaca")
+Waushara <- get_ssurgo(template = "WI137", label = "Waushara")
+Winnebago <- get_ssurgo(template = "WI139", label = "Winnebago")
+Wood <- get_ssurgo(template = "WI141", label = "Wood")
+CalumetManitowoc <- get_ssurgo(template = "WI600", label = "CalumetManitowoc")
+KenoshaRacine <- get_ssurgo(template = "WI601", label = "KenoshaRacine")
+MilwaukeeWaukesha <- get_ssurgo(template = "WI602", label = "MilwaukeeWaukesha")
+```
+
+The data is now downloaded and accessible in your working directory.
