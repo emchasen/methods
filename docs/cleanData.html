@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="emchasen" />
+
+<meta name="date" content="2022-01-26" />
+
+<title>Clean Data</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Pasture Model</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Clean Data</h1>
+<h4 class="author">emchasen</h4>
+<h4 class="date">2022-01-26</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-08-26
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>methods/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220103code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220103)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220103code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220103)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong8247efd">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong> 8247efd
+</a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong8247efd"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version 8247efd.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+
+Untracked files:
+    Untracked:  analysis/rsconnect/
+    Untracked:  cropData.csv
+    Untracked:  data/Adams_SSURGO_chorizon.csv
+    Untracked:  data/Adams_SSURGO_cocropyld.csv
+    Untracked:  data/Adams_SSURGO_component.csv
+    Untracked:  data/Adams_SSURGO_mapunit.csv
+    Untracked:  data/Ashland_SSURGO_chorizon.csv
+    Untracked:  data/Ashland_SSURGO_cocropyld.csv
+    Untracked:  data/Ashland_SSURGO_component.csv
+    Untracked:  data/Ashland_SSURGO_mapunit.csv
+    Untracked:  data/Barron_SSURGO_chorizon.csv
+    Untracked:  data/Barron_SSURGO_cocropyld.csv
+    Untracked:  data/Barron_SSURGO_component.csv
+    Untracked:  data/Barron_SSURGO_mapunit.csv
+    Untracked:  data/Bayfield_SSURGO_chorizon.csv
+    Untracked:  data/Bayfield_SSURGO_cocropyld.csv
+    Untracked:  data/Bayfield_SSURGO_component.csv
+    Untracked:  data/Bayfield_SSURGO_mapunit.csv
+    Untracked:  data/Brown_SSURGO_chorizon.csv
+    Untracked:  data/Brown_SSURGO_cocropyld.csv
+    Untracked:  data/Brown_SSURGO_component.csv
+    Untracked:  data/Brown_SSURGO_mapunit.csv
+    Untracked:  data/Buffalo_SSURGO_chorizon.csv
+    Untracked:  data/Buffalo_SSURGO_cocropyld.csv
+    Untracked:  data/Buffalo_SSURGO_component.csv
+    Untracked:  data/Buffalo_SSURGO_mapunit.csv
+    Untracked:  data/Burnett_SSURGO_chorizon.csv
+    Untracked:  data/Burnett_SSURGO_cocropyld.csv
+    Untracked:  data/Burnett_SSURGO_component.csv
+    Untracked:  data/Burnett_SSURGO_mapunit.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_chorizon.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_cocropyld.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_component.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_mapunit.csv
+    Untracked:  data/Chippewa_SSURGO_chorizon.csv
+    Untracked:  data/Chippewa_SSURGO_cocropyld.csv
+    Untracked:  data/Chippewa_SSURGO_component.csv
+    Untracked:  data/Chippewa_SSURGO_mapunit.csv
+    Untracked:  data/Clark_SSURGO_chorizon.csv
+    Untracked:  data/Clark_SSURGO_cocropyld.csv
+    Untracked:  data/Clark_SSURGO_component.csv
+    Untracked:  data/Clark_SSURGO_mapunit.csv
+    Untracked:  data/Columbia_SSURGO_chorizon.csv
+    Untracked:  data/Columbia_SSURGO_cocropyld.csv
+    Untracked:  data/Columbia_SSURGO_component.csv
+    Untracked:  data/Columbia_SSURGO_mapunit.csv
+    Untracked:  data/Crawford_SSURGO_chorizon.csv
+    Untracked:  data/Crawford_SSURGO_cocropyld.csv
+    Untracked:  data/Crawford_SSURGO_component.csv
+    Untracked:  data/Crawford_SSURGO_mapunit.csv
+    Untracked:  data/Dane_SSURGO_chorizon.csv
+    Untracked:  data/Dane_SSURGO_cocropyld.csv
+    Untracked:  data/Dane_SSURGO_component.csv
+    Untracked:  data/Dane_SSURGO_mapunit.csv
+    Untracked:  data/Dodge_SSURGO_chorizon.csv
+    Untracked:  data/Dodge_SSURGO_cocropyld.csv
+    Untracked:  data/Dodge_SSURGO_component.csv
+    Untracked:  data/Dodge_SSURGO_mapunit.csv
+    Untracked:  data/Door_SSURGO_chorizon.csv
+    Untracked:  data/Door_SSURGO_cocropyld.csv
+    Untracked:  data/Door_SSURGO_component.csv
+    Untracked:  data/Door_SSURGO_mapunit.csv
+    Untracked:  data/Douglas_SSURGO_chorizon.csv
+    Untracked:  data/Douglas_SSURGO_cocropyld.csv
+    Untracked:  data/Douglas_SSURGO_component.csv
+    Untracked:  data/Douglas_SSURGO_mapunit.csv
+    Untracked:  data/Dunn_SSURGO_chorizon.csv
+    Untracked:  data/Dunn_SSURGO_cocropyld.csv
+    Untracked:  data/Dunn_SSURGO_component.csv
+    Untracked:  data/Dunn_SSURGO_mapunit.csv
+    Untracked:  data/EauClaire_SSURGO_chorizon.csv
+    Untracked:  data/EauClaire_SSURGO_cocropyld.csv
+    Untracked:  data/EauClaire_SSURGO_component.csv
+    Untracked:  data/EauClaire_SSURGO_mapunit.csv
+    Untracked:  data/Florence_SSURGO_chorizon.csv
+    Untracked:  data/Florence_SSURGO_cocropyld.csv
+    Untracked:  data/Florence_SSURGO_component.csv
+    Untracked:  data/Florence_SSURGO_mapunit.csv
+    Untracked:  data/FondDuLac_SSURGO_chorizon.csv
+    Untracked:  data/FondDuLac_SSURGO_cocropyld.csv
+    Untracked:  data/FondDuLac_SSURGO_component.csv
+    Untracked:  data/FondDuLac_SSURGO_mapunit.csv
+    Untracked:  data/Forest_SSURGO_chorizon.csv
+    Untracked:  data/Forest_SSURGO_cocropyld.csv
+    Untracked:  data/Forest_SSURGO_component.csv
+    Untracked:  data/Forest_SSURGO_mapunit.csv
+    Untracked:  data/Grant_SSURGO_chorizon.csv
+    Untracked:  data/Grant_SSURGO_cocropyld.csv
+    Untracked:  data/Grant_SSURGO_component.csv
+    Untracked:  data/Grant_SSURGO_mapunit.csv
+    Untracked:  data/GreenLake_SSURGO_chorizon.csv
+    Untracked:  data/GreenLake_SSURGO_cocropyld.csv
+    Untracked:  data/GreenLake_SSURGO_component.csv
+    Untracked:  data/GreenLake_SSURGO_mapunit.csv
+    Untracked:  data/Green_SSURGO_chorizon.csv
+    Untracked:  data/Green_SSURGO_cocropyld.csv
+    Untracked:  data/Green_SSURGO_component.csv
+    Untracked:  data/Green_SSURGO_mapunit.csv
+    Untracked:  data/Iowa_SSURGO_chorizon.csv
+    Untracked:  data/Iowa_SSURGO_cocropyld.csv
+    Untracked:  data/Iowa_SSURGO_component.csv
+    Untracked:  data/Iowa_SSURGO_mapunit.csv
+    Untracked:  data/Iron_SSURGO_chorizon.csv
+    Untracked:  data/Iron_SSURGO_cocropyld.csv
+    Untracked:  data/Iron_SSURGO_component.csv
+    Untracked:  data/Iron_SSURGO_mapunit.csv
+    Untracked:  data/Jackson_SSURGO_chorizon.csv
+    Untracked:  data/Jackson_SSURGO_cocropyld.csv
+    Untracked:  data/Jackson_SSURGO_component.csv
+    Untracked:  data/Jackson_SSURGO_mapunit.csv
+    Untracked:  data/Jefferson_SSURGO_chorizon.csv
+    Untracked:  data/Jefferson_SSURGO_cocropyld.csv
+    Untracked:  data/Jefferson_SSURGO_component.csv
+    Untracked:  data/Jefferson_SSURGO_mapunit.csv
+    Untracked:  data/Juneau_SSURGO_chorizon.csv
+    Untracked:  data/Juneau_SSURGO_cocropyld.csv
+    Untracked:  data/Juneau_SSURGO_component.csv
+    Untracked:  data/Juneau_SSURGO_mapunit.csv
+    Untracked:  data/KenoshaRacine_SSURGO_chorizon.csv
+    Untracked:  data/KenoshaRacine_SSURGO_cocropyld.csv
+    Untracked:  data/KenoshaRacine_SSURGO_component.csv
+    Untracked:  data/KenoshaRacine_SSURGO_mapunit.csv
+    Untracked:  data/Kewaunee_SSURGO_chorizon.csv
+    Untracked:  data/Kewaunee_SSURGO_cocropyld.csv
+    Untracked:  data/Kewaunee_SSURGO_component.csv
+    Untracked:  data/Kewaunee_SSURGO_mapunit.csv
+    Untracked:  data/LaCrosse_SSURGO_chorizon.csv
+    Untracked:  data/LaCrosse_SSURGO_cocropyld.csv
+    Untracked:  data/LaCrosse_SSURGO_component.csv
+    Untracked:  data/LaCrosse_SSURGO_mapunit.csv
+    Untracked:  data/Lafayette_SSURGO_chorizon.csv
+    Untracked:  data/Lafayette_SSURGO_cocropyld.csv
+    Untracked:  data/Lafayette_SSURGO_component.csv
+    Untracked:  data/Lafayette_SSURGO_mapunit.csv
+    Untracked:  data/Langlade_SSURGO_chorizon.csv
+    Untracked:  data/Langlade_SSURGO_cocropyld.csv
+    Untracked:  data/Langlade_SSURGO_component.csv
+    Untracked:  data/Langlade_SSURGO_mapunit.csv
+    Untracked:  data/Lincoln_SSURGO_chorizon.csv
+    Untracked:  data/Lincoln_SSURGO_cocropyld.csv
+    Untracked:  data/Lincoln_SSURGO_component.csv
+    Untracked:  data/Lincoln_SSURGO_mapunit.csv
+    Untracked:  data/Manitowoc_SSURGO_chorizon.csv
+    Untracked:  data/Manitowoc_SSURGO_cocropyld.csv
+    Untracked:  data/Manitowoc_SSURGO_component.csv
+    Untracked:  data/Manitowoc_SSURGO_mapunit.csv
+    Untracked:  data/Marathon_SSURGO_chorizon.csv
+    Untracked:  data/Marathon_SSURGO_cocropyld.csv
+    Untracked:  data/Marathon_SSURGO_component.csv
+    Untracked:  data/Marathon_SSURGO_mapunit.csv
+    Untracked:  data/Marinette_SSURGO_chorizon.csv
+    Untracked:  data/Marinette_SSURGO_cocropyld.csv
+    Untracked:  data/Marinette_SSURGO_component.csv
+    Untracked:  data/Marinette_SSURGO_mapunit.csv
+    Untracked:  data/Marquette_SSURGO_chorizon.csv
+    Untracked:  data/Marquette_SSURGO_cocropyld.csv
+    Untracked:  data/Marquette_SSURGO_component.csv
+    Untracked:  data/Marquette_SSURGO_mapunit.csv
+    Untracked:  data/Menominee_SSURGO_chorizon.csv
+    Untracked:  data/Menominee_SSURGO_cocropyld.csv
+    Untracked:  data/Menominee_SSURGO_component.csv
+    Untracked:  data/Menominee_SSURGO_mapunit.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_chorizon.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_cocropyld.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_component.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_mapunit.csv
+    Untracked:  data/Monroe_SSURGO_chorizon.csv
+    Untracked:  data/Monroe_SSURGO_cocropyld.csv
+    Untracked:  data/Monroe_SSURGO_component.csv
+    Untracked:  data/Monroe_SSURGO_mapunit.csv
+    Untracked:  data/Oconto_SSURGO_chorizon.csv
+    Untracked:  data/Oconto_SSURGO_cocropyld.csv
+    Untracked:  data/Oconto_SSURGO_component.csv
+    Untracked:  data/Oconto_SSURGO_mapunit.csv
+    Untracked:  data/Oneida_SSURGO_chorizon.csv
+    Untracked:  data/Oneida_SSURGO_cocropyld.csv
+    Untracked:  data/Oneida_SSURGO_component.csv
+    Untracked:  data/Oneida_SSURGO_mapunit.csv
+    Untracked:  data/Outagamie_SSURGO_chorizon.csv
+    Untracked:  data/Outagamie_SSURGO_cocropyld.csv
+    Untracked:  data/Outagamie_SSURGO_component.csv
+    Untracked:  data/Outagamie_SSURGO_mapunit.csv
+    Untracked:  data/Ozaukee_SSURGO_chorizon.csv
+    Untracked:  data/Ozaukee_SSURGO_cocropyld.csv
+    Untracked:  data/Ozaukee_SSURGO_component.csv
+    Untracked:  data/Ozaukee_SSURGO_mapunit.csv
+    Untracked:  data/Pepin_SSURGO_chorizon.csv
+    Untracked:  data/Pepin_SSURGO_cocropyld.csv
+    Untracked:  data/Pepin_SSURGO_component.csv
+    Untracked:  data/Pepin_SSURGO_mapunit.csv
+    Untracked:  data/Pierce_SSURGO_chorizon.csv
+    Untracked:  data/Pierce_SSURGO_cocropyld.csv
+    Untracked:  data/Pierce_SSURGO_component.csv
+    Untracked:  data/Pierce_SSURGO_mapunit.csv
+    Untracked:  data/Polk_SSURGO_chorizon.csv
+    Untracked:  data/Polk_SSURGO_cocropyld.csv
+    Untracked:  data/Polk_SSURGO_component.csv
+    Untracked:  data/Polk_SSURGO_mapunit.csv
+    Untracked:  data/Portage_SSURGO_chorizon.csv
+    Untracked:  data/Portage_SSURGO_cocropyld.csv
+    Untracked:  data/Portage_SSURGO_component.csv
+    Untracked:  data/Portage_SSURGO_mapunit.csv
+    Untracked:  data/Price_SSURGO_chorizon.csv
+    Untracked:  data/Price_SSURGO_cocropyld.csv
+    Untracked:  data/Price_SSURGO_component.csv
+    Untracked:  data/Price_SSURGO_mapunit.csv
+    Untracked:  data/Richland_SSURGO_chorizon.csv
+    Untracked:  data/Richland_SSURGO_cocropyld.csv
+    Untracked:  data/Richland_SSURGO_component.csv
+    Untracked:  data/Richland_SSURGO_mapunit.csv
+    Untracked:  data/Rock_SSURGO_chorizon.csv
+    Untracked:  data/Rock_SSURGO_cocropyld.csv
+    Untracked:  data/Rock_SSURGO_component.csv
+    Untracked:  data/Rock_SSURGO_mapunit.csv
+    Untracked:  data/Rusk_SSURGO_chorizon.csv
+    Untracked:  data/Rusk_SSURGO_cocropyld.csv
+    Untracked:  data/Rusk_SSURGO_component.csv
+    Untracked:  data/Rusk_SSURGO_mapunit.csv
+    Untracked:  data/Sauk_SSURGO_chorizon.csv
+    Untracked:  data/Sauk_SSURGO_cocropyld.csv
+    Untracked:  data/Sauk_SSURGO_component.csv
+    Untracked:  data/Sauk_SSURGO_mapunit.csv
+    Untracked:  data/Sawyer_SSURGO_chorizon.csv
+    Untracked:  data/Sawyer_SSURGO_cocropyld.csv
+    Untracked:  data/Sawyer_SSURGO_component.csv
+    Untracked:  data/Sawyer_SSURGO_mapunit.csv
+    Untracked:  data/Shawano_SSURGO_chorizon.csv
+    Untracked:  data/Shawano_SSURGO_cocropyld.csv
+    Untracked:  data/Shawano_SSURGO_component.csv
+    Untracked:  data/Shawano_SSURGO_mapunit.csv
+    Untracked:  data/Sheboygan_SSURGO_chorizon.csv
+    Untracked:  data/Sheboygan_SSURGO_cocropyld.csv
+    Untracked:  data/Sheboygan_SSURGO_component.csv
+    Untracked:  data/Sheboygan_SSURGO_mapunit.csv
+    Untracked:  data/StCroix_SSURGO_chorizon.csv
+    Untracked:  data/StCroix_SSURGO_cocropyld.csv
+    Untracked:  data/StCroix_SSURGO_component.csv
+    Untracked:  data/StCroix_SSURGO_mapunit.csv
+    Untracked:  data/Taylor_SSURGO_chorizon.csv
+    Untracked:  data/Taylor_SSURGO_cocropyld.csv
+    Untracked:  data/Taylor_SSURGO_component.csv
+    Untracked:  data/Taylor_SSURGO_mapunit.csv
+    Untracked:  data/Trempealeau_SSURGO_chorizon.csv
+    Untracked:  data/Trempealeau_SSURGO_cocropyld.csv
+    Untracked:  data/Trempealeau_SSURGO_component.csv
+    Untracked:  data/Trempealeau_SSURGO_mapunit.csv
+    Untracked:  data/Vernon_SSURGO_chorizon.csv
+    Untracked:  data/Vernon_SSURGO_cocropyld.csv
+    Untracked:  data/Vernon_SSURGO_component.csv
+    Untracked:  data/Vernon_SSURGO_mapunit.csv
+    Untracked:  data/Vilas_SSURGO_chorizon.csv
+    Untracked:  data/Vilas_SSURGO_cocropyld.csv
+    Untracked:  data/Vilas_SSURGO_component.csv
+    Untracked:  data/Vilas_SSURGO_mapunit.csv
+    Untracked:  data/Walworth_SSURGO_chorizon.csv
+    Untracked:  data/Walworth_SSURGO_cocropyld.csv
+    Untracked:  data/Walworth_SSURGO_component.csv
+    Untracked:  data/Walworth_SSURGO_mapunit.csv
+    Untracked:  data/Washburn_SSURGO_chorizon.csv
+    Untracked:  data/Washburn_SSURGO_cocropyld.csv
+    Untracked:  data/Washburn_SSURGO_component.csv
+    Untracked:  data/Washburn_SSURGO_mapunit.csv
+    Untracked:  data/Washington_SSURGO_chorizon.csv
+    Untracked:  data/Washington_SSURGO_cocropyld.csv
+    Untracked:  data/Washington_SSURGO_component.csv
+    Untracked:  data/Washington_SSURGO_mapunit.csv
+    Untracked:  data/Waupaca_SSURGO_chorizon.csv
+    Untracked:  data/Waupaca_SSURGO_cocropyld.csv
+    Untracked:  data/Waupaca_SSURGO_component.csv
+    Untracked:  data/Waupaca_SSURGO_mapunit.csv
+    Untracked:  data/Waushara_SSURGO_chorizon.csv
+    Untracked:  data/Waushara_SSURGO_cocropyld.csv
+    Untracked:  data/Waushara_SSURGO_component.csv
+    Untracked:  data/Waushara_SSURGO_mapunit.csv
+    Untracked:  data/Winnebago_SSURGO_chorizon.csv
+    Untracked:  data/Winnebago_SSURGO_cocropyld.csv
+    Untracked:  data/Winnebago_SSURGO_component.csv
+    Untracked:  data/Winnebago_SSURGO_mapunit.csv
+    Untracked:  data/Wood_SSURGO_chorizon.csv
+    Untracked:  data/Wood_SSURGO_cocropyld.csv
+    Untracked:  data/Wood_SSURGO_component.csv
+    Untracked:  data/Wood_SSURGO_mapunit.csv
+    Untracked:  output/cropData.csv
+    Untracked:  output/grass_pred.rds
+
+Unstaged changes:
+    Modified:   .Rprofile
+    Modified:   .gitattributes
+    Modified:   .gitignore
+    Modified:   README.md
+    Modified:   _workflowr.yml
+    Modified:   analysis/_site.yml
+    Modified:   code/README.md
+    Modified:   data/README.md
+    Modified:   methods.Rproj
+    Modified:   output/README.md
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/cleanData.Rmd</code>) and HTML
+(<code>docs/cleanData.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+8247efd
+</td>
+<td>
+emchasen
+</td>
+<td>
+2022-08-26
+</td>
+<td>
+Publish the second files
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>After moving the files that were downloaded in step one into my
+working directory, I created functions to read in the files with the
+same data from each of the counties, and bind them together. These data
+include properties of the horizon layers, soil components, mapunits, and
+representative component crop yields.</p>
+<div id="function-definitions" class="section level3">
+<h3>Function definitions</h3>
+<pre class="r"><code>#extract chorizon layers
+library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.6     ✔ dplyr   1.0.8
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>read_horizon &lt;- function(){
+  horizon &lt;- list()
+  for(i in 1:length(counties)){
+    filename = paste0(&quot;data/&quot;, counties[i], &quot;_SSURGO_chorizon.csv&quot;)
+    horizon[[i]] &lt;- read.csv(file = filename, na.strings = c(&quot; &quot;, &quot;&quot;, &quot;NA&quot;, &quot;NaN&quot;))
+  }
+  horizon &lt;- do.call(rbind.data.frame, horizon)
+}
+
+#extract component layers
+read_component &lt;- function(){
+  component &lt;- list()
+  for(i in 1:length(counties)){
+    filename = paste0(&quot;data/&quot;, counties[i], &quot;_SSURGO_component.csv&quot;)
+    component[[i]] &lt;- read.csv(file = filename, na.strings = c(&quot; &quot;, &quot; &quot;, &quot;NA&quot;, &quot;NaN&quot;))
+    component[[i]]$county &lt;- counties[i]
+  }
+  component &lt;- do.call(rbind.data.frame, component)
+}
+
+# #extract mapunit and attach county name
+# read_mapunit &lt;- function(){
+#   mapunit &lt;- list()
+#   for(i in 1:length(counties)){
+#     filename = paste0(&quot;data/&quot;, counties[i], &quot;_SSURGO_mapunit.csv&quot;)
+#     mapunit[[i]] &lt;- read.csv(file = filename, na.strings = c(&quot; &quot;, &quot;NA&quot;, &quot;NaN&quot;, &quot;&quot;))
+#   }
+#   mapunit &lt;- do.call(rbind.data.frame, mapunit)
+# }
+
+#extract component yields
+read_cocropyld &lt;- function(){
+  cocropyld &lt;- list()
+  for(i in 1:length(counties)){
+    filename = paste0(&quot;data/&quot;, counties[i], &quot;_SSURGO_cocropyld.csv&quot;)
+    cocropyld[[i]] &lt;- read.csv(file = filename, na.strings = c(&quot;&quot;, NA, &quot; &quot;, &quot;NaN&quot;))
+  }
+  cocropyld &lt;- do.call(rbind.data.frame, cocropyld)
+}</code></pre>
+</div>
+</div>
+<div id="read-in-data" class="section level2">
+<h2>Read in data</h2>
+<pre class="r"><code>counties &lt;- c(&quot;Brown&quot;, &quot;Crawford&quot;, &quot;Kewaunee&quot;, &quot;Monroe&quot;, &quot;Marathon&quot;, &quot;Taylor&quot;, &quot;Vernon&quot;, &quot;Clark&quot;, &quot;Grant&quot;,&quot;Shawano&quot;, &quot;Lafayette&quot;, &quot;Dane&quot;, &quot;Chippewa&quot;, &quot;Dodge&quot;, &quot;FondDuLac&quot;, &quot;Manitowoc&quot;, &quot;Barron&quot;, &quot;Adams&quot;, &quot;Ashland&quot;, &quot;Bayfield&quot;, &quot;Buffalo&quot;,&quot;Burnett&quot;, &quot;Columbia&quot;, &quot;Door&quot;, &quot;Douglas&quot;,&quot;Dunn&quot;, &quot;EauClaire&quot;, &quot;Florence&quot;, &#39;Forest&#39;, &quot;Green&quot;, &quot;GreenLake&quot;, &quot;Iowa&quot;, &quot;Iron&quot;,&quot;Jackson&quot;, &quot;Jefferson&quot;, &quot;Juneau&quot;, &quot;LaCrosse&quot;, &quot;Langlade&quot;,&quot;Lincoln&quot;, &quot;Marinette&quot;,&quot;Marquette&quot;, &quot;Menominee&quot;, &quot;Oconto&quot;, &quot;Oneida&quot;, &quot;Outagamie&quot;, &quot;Ozaukee&quot;, &quot;Pepin&quot;, &quot;Pierce&quot;,&quot;Polk&quot;, &quot;Portage&quot;, &quot;Price&quot;, &quot;Richland&quot;, &quot;Rock&quot;, &quot;Rusk&quot;, &quot;StCroix&quot;, &quot;Sauk&quot;, &quot;Sawyer&quot;,&quot;Sheboygan&quot;, &quot;Trempealeau&quot;, &quot;Vilas&quot;, &quot;Walworth&quot;, &quot;Washburn&quot;, &quot;Washington&quot;, &quot;Waupaca&quot;,&quot;Waushara&quot;, &quot;Winnebago&quot;, &quot;Wood&quot;, &quot;CalumetManitowoc&quot;, &quot;KenoshaRacine&quot;, &quot;MilwaukeeWaukesha&quot;)
+
+horizon &lt;- read_horizon()
+str(horizon)</code></pre>
+<pre><code>&#39;data.frame&#39;:   95842 obs. of  171 variables:
+ $ hzname          : chr  &quot;Ap&quot; &quot;Bt&quot; &quot;2Bt&quot; &quot;2C&quot; ...
+ $ desgndisc       : int  NA NA 2 2 NA NA NA NA NA NA ...
+ $ desgnmaster     : chr  &quot;A&quot; &quot;B&quot; &quot;B&quot; &quot;C&quot; ...
+ $ desgnmasterprime: chr  NA NA NA NA ...
+ $ desgnvert       : int  NA NA NA NA NA NA NA NA NA NA ...
+ $ hzdept.l        : int  0 86 94 107 36 16 71 16 36 71 ...
+ $ hzdept.r        : int  0 89 99 112 38 28 81 28 38 81 ...
+ $ hzdept.h        : int  0 91 104 119 41 30 86 30 41 86 ...
+ $ hzdepb.l        : int  16 94 107 200 71 36 86 36 71 86 ...
+ $ hzdepb.r        : int  28 99 112 200 81 38 89 38 81 89 ...
+ $ hzdepb.h        : int  30 104 119 200 86 41 91 41 86 91 ...
+ $ hzthk.l         : int  16 3 5 81 30 6 0 6 30 0 ...
+ $ hzthk.r         : int  28 10 13 88 43 10 8 10 43 8 ...
+ $ hzthk.h         : int  30 18 25 93 50 25 20 25 50 20 ...
+ $ fraggt10.l      : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ fraggt10.r      : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ fraggt10.h      : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ frag3to10.l     : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ frag3to10.r     : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ frag3to10.h     : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ sieveno4.l      : int  100 100 100 100 88 100 100 100 88 100 ...
+ $ sieveno4.r      : num  100 100 100 100 95 100 100 100 95 100 ...
+ $ sieveno4.h      : int  100 100 100 100 100 100 100 100 100 100 ...
+ $ sieveno10.l     : int  100 100 100 100 88 100 100 100 88 100 ...
+ $ sieveno10.r     : num  100 100 100 100 95 100 100 100 95 100 ...
+ $ sieveno10.h     : num  100 100 100 100 100 100 100 100 100 100 ...
+ $ sieveno40.l     : num  93 72 89 88 82 92 92 92 82 92 ...
+ $ sieveno40.r     : num  95 77 99 98 89 94 94 94 89 94 ...
+ $ sieveno40.h     : num  100 82 100 100 97 96 96 96 97 96 ...
+ $ sieveno200.l    : num  33 35 86 81 13 14 14 14 13 14 ...
+ $ sieveno200.r    : num  35 40 96 91 15 16 16 16 15 16 ...
+ $ sieveno200.h    : int  40 45 100 100 19 18 18 18 19 18 ...
+ $ sandtotal.l     : num  70 45 2 2 85 85 85 85 85 85 ...
+ $ sandtotal.r     : num  79 67 5 10 92 92 92 92 92 92 ...
+ $ sandtotal.h     : num  90 72 18 20 99 98 98 98 99 98 ...
+ $ sandvc.l        : num  0 2.8 0 0 0 0 0 0 0 0 ...
+ $ sandvc.r        : num  0 4.7 0.2 0.3 0 0 0 0 0 0 ...
+ $ sandvc.h        : num  0 6.4 0.6 0.6 0 0 0 0 0 0 ...
+ $ sandco.l        : num  0 0.5 0 0 0.3 0.3 0.3 0.3 0.3 0.3 ...
+ $ sandco.r        : num  1.9 13.6 0.3 0.6 1.3 1.3 1.3 1.3 1.3 1.3 ...
+ $ sandco.h        : num  2.2 14.1 1.1 1.2 1.4 1.4 1.4 1.4 1.4 1.4 ...
+ $ sandmed.l       : num  0 9.3 0 0 2.4 2.4 2.4 2.4 2.4 2.4 ...
+ $ sandmed.r       : num  12.9 16.7 0.6 1.1 17.3 17.3 17.3 17.3 17.3 17.3 ...
+ $ sandmed.h       : num  14.6 17 2 2.3 18.6 18.4 18.4 18.4 18.6 18.4 ...
+ $ sandfine.l      : num  5.3 18.7 0.5 0.5 28.8 28.5 28.5 28.5 28.8 28.5 ...
+ $ sandfine.r      : num  39.2 20.2 1.6 3.2 59.9 59.9 59.9 59.9 59.9 59.9 ...
+ $ sandfine.h      : num  44.6 21.3 5.7 6.3 64.5 63.8 63.8 63.8 64.5 63.8 ...
+ $ sandvf.l        : num  19.4 11.7 1.5 1.5 12.4 12.4 12.4 12.4 12.4 12.4 ...
+ $ sandvf.r        : num  25 11.8 2.3 4.8 13.5 13.5 13.5 13.5 13.5 13.5 ...
+ $ sandvf.h        : num  84.7 13.7 8.6 9.6 67.5 66.8 66.8 66.8 67.5 66.8 ...
+ $ silttotal.l     : num  2 13 40 40 0 0 0 0 0 0 ...
+ $ silttotal.r     : num  16 23 45 40 6 5 5 5 6 5 ...
+ $ silttotal.h     : num  27 42 58 58 14 14 14 14 14 14 ...
+ $ siltco.l        : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ siltco.r        : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ siltco.h        : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ siltfine.l      : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ siltfine.r      : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ siltfine.h      : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ claytotal.l     : num  3 5 40 40 1 1 1 1 1 1 ...
+ $ claytotal.r     : num  5 10 50 50 2 3 3 3 2 3 ...
+ $ claytotal.h     : num  10 15 57 57 5 5 5 5 5 5 ...
+ $ claysizedcarb.l : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ claysizedcarb.r : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ claysizedcarb.h : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ om.l            : num  1 0.5 0 0 0.5 0.5 0.5 0.5 0.5 0.5 ...
+ $ om.r            : num  2 1 0.25 0.25 1 1 1 1 1 1 ...
+ $ om.h            : num  3 2 0.5 0.5 2 2 2 2 2 2 ...
+ $ dbtenthbar.l    : logi  NA NA NA NA NA NA ...
+ $ dbtenthbar.r    : logi  NA NA NA NA NA NA ...
+ $ dbtenthbar.h    : logi  NA NA NA NA NA NA ...
+ $ dbthirdbar.l    : num  1.48 1.57 1.38 1.31 1.34 1.54 1.54 1.54 1.34 1.54 ...
+ $ dbthirdbar.r    : num  1.53 1.6 1.42 1.38 1.42 1.57 1.57 1.57 1.42 1.57 ...
+ $ dbthirdbar.h    : num  1.58 1.63 1.47 1.44 1.49 1.6 1.6 1.6 1.49 1.6 ...
+ $ dbfifteenbar.l  : logi  NA NA NA NA NA NA ...
+ $ dbfifteenbar.r  : logi  NA NA NA NA NA NA ...
+ $ dbfifteenbar.h  : logi  NA NA NA NA NA NA ...
+ $ dbovendry.l     : num  1.49 1.59 1.59 1.51 1.34 1.54 1.54 1.54 1.34 1.54 ...
+ $ dbovendry.r     : num  1.54 1.62 1.63 1.58 1.42 1.57 1.57 1.57 1.42 1.57 ...
+ $ dbovendry.h     : num  1.59 1.64 1.68 1.63 1.49 1.6 1.6 1.6 1.49 1.6 ...
+ $ partdensity     : num  2.62 2.64 2.67 2.68 2.64 2.64 2.64 2.64 2.64 2.64 ...
+ $ ksat.l          : num  42.34 14.11 0.42 0.42 42.34 ...
+ $ ksat.r          : num  92 23 0.92 0.92 91.74 ...
+ $ ksat.h          : num  141.14 42.34 1.41 1.41 141.14 ...
+ $ awc.l           : num  0.1 0.14 0.1 0.1 0.06 0.06 0.05 0.06 0.06 0.05 ...
+ $ awc.r           : num  0.11 0.15 0.11 0.11 0.07 0.08 0.06 0.08 0.07 0.06 ...
+ $ awc.h           : num  0.12 0.16 0.12 0.12 0.08 0.09 0.07 0.09 0.08 0.07 ...
+ $ wtenthbar.l     : num  10.2 NA NA NA 6 5.6 5.6 5.6 6 5.6 ...
+ $ wtenthbar.r     : num  16.8 NA NA NA 10.5 9.8 9.8 9.8 10.5 9.8 ...
+ $ wtenthbar.h     : num  24 NA NA NA 16.3 14.5 14.5 14.5 16.3 14.5 ...
+ $ wthirdbar.l     : num  7.8 19.4 34.4 34.6 4.7 4.3 4.3 4.3 4.7 4.3 ...
+ $ wthirdbar.r     : num  12.8 22.1 39.9 40.4 8.2 7.6 7.6 7.6 8.2 7.6 ...
+ $ wthirdbar.h     : num  18.6 26.8 44.1 46 12.8 11.2 11.2 11.2 12.8 11.2 ...
+ $ wfifteenbar.l   : num  3 4.2 21.6 21 1.5 1.8 1.8 1.8 1.5 1.8 ...
+ $ wfifteenbar.r   : num  4.3 7.3 27 26.2 2.2 3.1 3.1 3.1 2.2 3.1 ...
+ $ wfifteenbar.h   : num  7.4 10.4 30.7 29.9 4 4.4 4.4 4.4 4 4.4 ...
+ $ wsatiated.l     : int  38 36 43 44 39 37 37 37 39 37 ...
+ $ wsatiated.r     : int  40 37 44 46 43 39 39 39 43 39 ...
+ $ wsatiated.h     : int  41 39 46 49 47 40 40 40 47 40 ...
+  [list output truncated]</code></pre>
+<pre class="r"><code>component &lt;- read_component()
+str(component)</code></pre>
+<pre><code>&#39;data.frame&#39;:   27776 obs. of  110 variables:
+ $ comppct.l       : int  NA 85 3 2 3 3 85 3 1 85 ...
+ $ comppct.r       : int  100 90 6 4 4 3 88 3 2 88 ...
+ $ comppct.h       : int  NA 95 8 7 4 4 90 4 3 90 ...
+ $ compname        : chr  &quot;Water&quot; &quot;Ossineke&quot; &quot;Solona&quot; &quot;Longrie&quot; ...
+ $ compkind        : chr  &quot;Miscellaneous area&quot; &quot;Series&quot; &quot;Series&quot; &quot;Series&quot; ...
+ $ majcompflag     : chr  &quot;Yes&quot; &quot;Yes&quot; &quot;No &quot; &quot;No &quot; ...
+ $ otherph         : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+ $ localphase      : chr  &quot;miscellaneous&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+ $ slope.l         : num  0 0 0 0 12 12 12 12 12 6 ...
+ $ slope.r         : num  0 2 2 2 16 16 16 16 16 9 ...
+ $ slope.h         : num  0 2 2 2 20 20 20 20 20 12 ...
+ $ slopelenusle.l  : int  65 NA NA NA NA NA NA NA NA NA ...
+ $ slopelenusle.r  : int  65 76 76 76 30 30 30 30 30 46 ...
+ $ slopelenusle.h  : int  65 NA NA NA NA NA NA NA NA NA ...
+ $ runoff          : chr  &quot;&quot; &quot;High&quot; &quot;High&quot; &quot;Low&quot; ...
+ $ tfact           : int  NA 4 5 2 3 2 3 4 5 3 ...
+ $ wei             : int  NA 86 86 86 86 86 86 134 250 86 ...
+ $ weg             : chr  NA &quot;3&quot; &quot;3&quot; &quot;3&quot; ...
+ $ erocl           : chr  &quot;&quot; &quot;None - deposition&quot; &quot;None - deposition&quot; &quot;None - deposition&quot; ...
+ $ earthcovkind1   : chr  &quot;&quot; &quot;Crop cover&quot; &quot;Crop cover&quot; &quot;Tree cover&quot; ...
+ $ earthcovkind2   : chr  &quot;&quot; &quot;Row crop&quot; &quot;Row crop&quot; &quot;Intermixed conifers and hardwoods&quot; ...
+ $ hydricon        : chr  &quot;Neither wooded nor farmable under natural conditions&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+ $ hydricrating    : chr  &quot;Unranked&quot; &quot;No&quot; &quot;No&quot; &quot;No&quot; ...
+ $ drainagecl      : chr  &quot;&quot; &quot;Moderately well drained&quot; &quot;Somewhat poorly drained&quot; &quot;Well drained&quot; ...
+ $ elev.l          : int  203 180 180 180 180 180 180 180 180 180 ...
+ $ elev.r          : int  269 290 290 290 290 290 290 290 290 290 ...
+ $ elev.h          : int  335 400 400 400 400 400 400 400 400 400 ...
+ $ aspectccwise    : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ aspectrep       : int  0 180 180 180 180 180 180 180 180 180 ...
+ $ aspectcwise     : int  0 0 0 0 0 0 0 0 0 0 ...
+ $ geomdesc        : chr  &quot;&quot; &quot;drumlins on till plains, moraines on till plains&quot; &quot;depressions on ground moraines on till plains, drainageways on ground moraines on till plains&quot; &quot;ground moraines on till plains&quot; ...
+ $ albedodry.l     : num  NA 0.16 0.16 0.09 0.09 0.23 0.16 0.16 0.16 0.16 ...
+ $ albedodry.r     : num  0.08 0.23 0.23 0.16 0.16 0.3 0.23 0.16 0.23 0.23 ...
+ $ albedodry.h     : num  NA 0.37 0.37 0.23 0.23 0.37 0.37 0.37 0.44 0.37 ...
+ $ airtempa.l      : num  8 5 5 5 5 5 5 5 5 5 ...
+ $ airtempa.r      : num  10 6 6 6 6 6 6 6 6 6 ...
+ $ airtempa.h      : num  11 7 7 7 7 7 7 7 7 7 ...
+ $ map.l           : int  711 711 711 711 711 711 711 711 711 711 ...
+ $ map.r           : int  775 762 762 762 762 762 762 762 762 762 ...
+ $ map.h           : int  838 813 813 813 813 813 813 813 813 813 ...
+ $ reannualprecip.l: int  NA NA NA NA NA NA NA NA NA NA ...
+ $ reannualprecip.r: int  NA NA NA NA NA NA NA NA NA NA ...
+ $ reannualprecip.h: int  NA NA NA NA NA NA NA NA NA NA ...
+ $ ffd.l           : int  135 100 100 100 100 100 100 100 100 100 ...
+ $ ffd.r           : int  148 120 120 120 120 120 120 120 120 120 ...
+ $ ffd.h           : int  160 140 140 140 140 140 140 140 140 140 ...
+ $ nirrcapcl       : int  8 2 2 2 3 3 4 3 4 2 ...
+ $ nirrcapscl      : chr  &quot;w&quot; &quot;e&quot; &quot;w&quot; &quot;s&quot; ...
+ $ nirrcapunit     : int  NA NA NA NA NA NA NA NA NA NA ...
+ $ irrcapcl        : int  NA NA NA NA NA NA NA NA 3 NA ...
+ $ irrcapscl       : chr  &quot;&quot; &quot;&quot; &quot;&quot; &quot;&quot; ...
+ $ irrcapunit      : logi  NA NA NA NA NA NA ...
+ $ cropprodindex   : int  NA NA NA NA NA NA NA NA NA NA ...
+ $ constreeshrubgrp: chr  &quot;&quot; &quot;1s&quot; &quot;2&quot; &quot;6&quot; ...
+ $ wndbrksuitgrp   : logi  NA NA NA NA NA NA ...
+ $ rsprod.l        : logi  NA NA NA NA NA NA ...
+ $ rsprod.r        : logi  NA NA NA NA NA NA ...
+ $ rsprod.h        : logi  NA NA NA NA NA NA ...
+ $ foragesuitgrpid : logi  NA NA NA NA NA NA ...
+ $ wlgrain         : logi  NA NA NA NA NA NA ...
+ $ wlgrass         : logi  NA NA NA NA NA NA ...
+ $ wlherbaceous    : logi  NA NA NA NA NA NA ...
+ $ wlshrub         : logi  NA NA NA NA NA NA ...
+ $ wlconiferous    : logi  NA NA NA NA NA NA ...
+ $ wlhardwood      : logi  NA NA NA NA NA NA ...
+ $ wlwetplant      : logi  NA NA NA NA NA NA ...
+ $ wlshallowwat    : logi  NA NA NA NA NA NA ...
+ $ wlrangeland     : logi  NA NA NA NA NA NA ...
+ $ wlopenland      : logi  NA NA NA NA NA NA ...
+ $ wlwoodland      : logi  NA NA NA NA NA NA ...
+ $ wlwetland       : logi  NA NA NA NA NA NA ...
+ $ soilslippot     : chr  NA NA NA NA ...
+ $ frostact        : chr  &quot;&quot; &quot;Moderate&quot; &quot;Moderate&quot; &quot;Moderate&quot; ...
+ $ initsub.l       : int  NA 0 0 0 0 0 0 0 0 0 ...
+ $ initsub.r       : int  NA 0 0 0 0 0 0 0 0 0 ...
+ $ initsub.h       : int  NA 0 0 0 0 0 0 0 0 0 ...
+ $ totalsub.l      : int  NA 0 0 0 0 0 0 0 0 0 ...
+ $ totalsub.r      : int  NA 0 0 0 0 0 0 0 0 0 ...
+ $ totalsub.h      : int  NA 0 0 0 0 0 0 0 0 0 ...
+ $ hydgrp          : chr  &quot;&quot; &quot;C/D&quot; &quot;C/D&quot; &quot;B&quot; ...
+ $ corcon          : chr  &quot;&quot; &quot;Moderate&quot; &quot;Low&quot; &quot;Moderate&quot; ...
+ $ corsteel        : chr  &quot;&quot; &quot;High&quot; &quot;High&quot; &quot;Moderate&quot; ...
+ $ taxclname       : chr  &quot;Mixed&quot; &quot;Fine-loamy, mixed, semiactive, frigid Oxyaquic Glossudalfs&quot; &quot;Coarse-loamy, mixed, superactive, frigid Aquic Argiudolls&quot; &quot;Coarse-loamy, mixed, superactive, frigid Typic Haplorthods&quot; ...
+ $ taxorder        : chr  &quot;&quot; &quot;Alfisols&quot; &quot;Mollisols&quot; &quot;Spodosols&quot; ...
+ $ taxsuborder     : chr  &quot;&quot; &quot;Udalfs&quot; &quot;Udolls&quot; &quot;Orthods&quot; ...
+ $ taxgrtgroup     : chr  &quot;&quot; &quot;Glossudalfs&quot; &quot;Argiudolls&quot; &quot;Haplorthods&quot; ...
+ $ taxsubgrp       : chr  &quot;&quot; &quot;Oxyaquic Glossudalfs&quot; &quot;Aquic Argiudolls&quot; &quot;Typic Haplorthods&quot; ...
+ $ taxpartsize     : chr  &quot;&quot; &quot;fine-loamy&quot; &quot;coarse-loamy&quot; &quot;coarse-loamy&quot; ...
+ $ taxpartsizemod  : chr  &quot;&quot; &quot;not used&quot; &quot;not used&quot; &quot;not used&quot; ...
+ $ taxceactcl      : chr  &quot;&quot; &quot;semiactive&quot; &quot;superactive&quot; &quot;superactive&quot; ...
+ $ taxreaction     : chr  &quot;&quot; &quot;not used&quot; &quot;not used&quot; &quot;not used&quot; ...
+ $ taxtempcl       : chr  &quot;&quot; &quot;frigid&quot; &quot;frigid&quot; &quot;frigid&quot; ...
+ $ taxmoistscl     : chr  &quot;&quot; &quot;Oxyaquic&quot; &quot;Typic&quot; &quot;Typic&quot; ...
+ $ taxtempregime   : chr  &quot;&quot; &quot;frigid&quot; &quot;frigid&quot; &quot;frigid&quot; ...
+ $ soiltaxedition  : chr  &quot;ninth edition&quot; &quot;eleventh edition&quot; &quot;eleventh edition&quot; &quot;eleventh edition&quot; ...
+ $ castorieindex   : logi  NA NA NA NA NA NA ...
+ $ flecolcomnum    : logi  NA NA NA NA NA NA ...
+ $ flhe            : logi  NA NA NA NA NA NA ...
+ $ flphe           : logi  NA NA NA NA NA NA ...
+  [list output truncated]</code></pre>
+<pre class="r"><code>#mapunit &lt;- read_mapunit()
+#str(mapunit)
+cocropyld &lt;- read_cocropyld()
+str(cocropyld)</code></pre>
+<pre><code>&#39;data.frame&#39;:   116228 obs. of  12 variables:
+ $ cropname     : chr  &quot;Alfalfa hay&quot; &quot;Corn&quot; &quot;Corn silage&quot; &quot;Grass-clover&quot; ...
+ $ yldunits     : chr  &quot;Tons&quot; &quot;Bu&quot; &quot;Tons&quot; &quot;AUM&quot; ...
+ $ nonirryield.l: num  3 70 11 5 3 65 3 36 3 70 ...
+ $ nonirryield.r: num  3 70 11 5 3 65 3 36 3 70 ...
+ $ nonirryield.h: num  3 70 11 5 3 65 3 36 3 70 ...
+ $ irryield.l   : int  NA NA NA NA NA NA NA NA NA NA ...
+ $ irryield.r   : num  NA NA NA NA NA NA NA NA NA NA ...
+ $ irryield.h   : int  NA NA NA NA NA NA NA NA NA NA ...
+ $ cropprodindex: logi  NA NA NA NA NA NA ...
+ $ vasoiprdgrp  : logi  NA NA NA NA NA NA ...
+ $ cokey        : int  18040162 18040162 18040162 18040162 18040162 18040162 18040162 18040162 18040163 18040163 ...
+ $ cocropyldkey : int  37252096 37252097 37252098 37252099 37252100 37252101 37252102 37252103 37252104 37252105 ...</code></pre>
+</div>
+<div id="clean-horizon" class="section level2">
+<h2>Clean horizon</h2>
+<p>Data was cleaned to include soil properties between 0-30 cm in depth,
+as well as a depth to bedrock and then filtered to include only pasture
+crops that were well represented across WI.</p>
+<pre class="r"><code>#deepest horizon bottom of each component
+depth &lt;- horizon %&gt;%
+  group_by(cokey) %&gt;%
+  summarise(total.depth = max(hzdepb.r))
+
+#filter to remove horizons that start below 30 cm
+horizon &lt;- horizon %&gt;%
+  filter(hzdept.r &lt; 31) %&gt;%
+  droplevels()
+
+colnames(horizon)</code></pre>
+<pre><code>  [1] &quot;hzname&quot;           &quot;desgndisc&quot;        &quot;desgnmaster&quot;     
+  [4] &quot;desgnmasterprime&quot; &quot;desgnvert&quot;        &quot;hzdept.l&quot;        
+  [7] &quot;hzdept.r&quot;         &quot;hzdept.h&quot;         &quot;hzdepb.l&quot;        
+ [10] &quot;hzdepb.r&quot;         &quot;hzdepb.h&quot;         &quot;hzthk.l&quot;         
+ [13] &quot;hzthk.r&quot;          &quot;hzthk.h&quot;          &quot;fraggt10.l&quot;      
+ [16] &quot;fraggt10.r&quot;       &quot;fraggt10.h&quot;       &quot;frag3to10.l&quot;     
+ [19] &quot;frag3to10.r&quot;      &quot;frag3to10.h&quot;      &quot;sieveno4.l&quot;      
+ [22] &quot;sieveno4.r&quot;       &quot;sieveno4.h&quot;       &quot;sieveno10.l&quot;     
+ [25] &quot;sieveno10.r&quot;      &quot;sieveno10.h&quot;      &quot;sieveno40.l&quot;     
+ [28] &quot;sieveno40.r&quot;      &quot;sieveno40.h&quot;      &quot;sieveno200.l&quot;    
+ [31] &quot;sieveno200.r&quot;     &quot;sieveno200.h&quot;     &quot;sandtotal.l&quot;     
+ [34] &quot;sandtotal.r&quot;      &quot;sandtotal.h&quot;      &quot;sandvc.l&quot;        
+ [37] &quot;sandvc.r&quot;         &quot;sandvc.h&quot;         &quot;sandco.l&quot;        
+ [40] &quot;sandco.r&quot;         &quot;sandco.h&quot;         &quot;sandmed.l&quot;       
+ [43] &quot;sandmed.r&quot;        &quot;sandmed.h&quot;        &quot;sandfine.l&quot;      
+ [46] &quot;sandfine.r&quot;       &quot;sandfine.h&quot;       &quot;sandvf.l&quot;        
+ [49] &quot;sandvf.r&quot;         &quot;sandvf.h&quot;         &quot;silttotal.l&quot;     
+ [52] &quot;silttotal.r&quot;      &quot;silttotal.h&quot;      &quot;siltco.l&quot;        
+ [55] &quot;siltco.r&quot;         &quot;siltco.h&quot;         &quot;siltfine.l&quot;      
+ [58] &quot;siltfine.r&quot;       &quot;siltfine.h&quot;       &quot;claytotal.l&quot;     
+ [61] &quot;claytotal.r&quot;      &quot;claytotal.h&quot;      &quot;claysizedcarb.l&quot; 
+ [64] &quot;claysizedcarb.r&quot;  &quot;claysizedcarb.h&quot;  &quot;om.l&quot;            
+ [67] &quot;om.r&quot;             &quot;om.h&quot;             &quot;dbtenthbar.l&quot;    
+ [70] &quot;dbtenthbar.r&quot;     &quot;dbtenthbar.h&quot;     &quot;dbthirdbar.l&quot;    
+ [73] &quot;dbthirdbar.r&quot;     &quot;dbthirdbar.h&quot;     &quot;dbfifteenbar.l&quot;  
+ [76] &quot;dbfifteenbar.r&quot;   &quot;dbfifteenbar.h&quot;   &quot;dbovendry.l&quot;     
+ [79] &quot;dbovendry.r&quot;      &quot;dbovendry.h&quot;      &quot;partdensity&quot;     
+ [82] &quot;ksat.l&quot;           &quot;ksat.r&quot;           &quot;ksat.h&quot;          
+ [85] &quot;awc.l&quot;            &quot;awc.r&quot;            &quot;awc.h&quot;           
+ [88] &quot;wtenthbar.l&quot;      &quot;wtenthbar.r&quot;      &quot;wtenthbar.h&quot;     
+ [91] &quot;wthirdbar.l&quot;      &quot;wthirdbar.r&quot;      &quot;wthirdbar.h&quot;     
+ [94] &quot;wfifteenbar.l&quot;    &quot;wfifteenbar.r&quot;    &quot;wfifteenbar.h&quot;   
+ [97] &quot;wsatiated.l&quot;      &quot;wsatiated.r&quot;      &quot;wsatiated.h&quot;     
+[100] &quot;lep.l&quot;            &quot;lep.r&quot;            &quot;lep.h&quot;           
+[103] &quot;ll.l&quot;             &quot;ll.r&quot;             &quot;ll.h&quot;            
+[106] &quot;pi.l&quot;             &quot;pi.r&quot;             &quot;pi.h&quot;            
+[109] &quot;aashind.l&quot;        &quot;aashind.r&quot;        &quot;aashind.h&quot;       
+[112] &quot;kwfact&quot;           &quot;kffact&quot;           &quot;caco3.l&quot;         
+[115] &quot;caco3.r&quot;          &quot;caco3.h&quot;          &quot;gypsum.l&quot;        
+[118] &quot;gypsum.r&quot;         &quot;gypsum.h&quot;         &quot;sar.l&quot;           
+[121] &quot;sar.r&quot;            &quot;sar.h&quot;            &quot;ec.l&quot;            
+[124] &quot;ec.r&quot;             &quot;ec.h&quot;             &quot;cec7.l&quot;          
+[127] &quot;cec7.r&quot;           &quot;cec7.h&quot;           &quot;ecec.l&quot;          
+[130] &quot;ecec.r&quot;           &quot;ecec.h&quot;           &quot;sumbases.l&quot;      
+[133] &quot;sumbases.r&quot;       &quot;sumbases.h&quot;       &quot;ph1to1h2o.l&quot;     
+[136] &quot;ph1to1h2o.r&quot;      &quot;ph1to1h2o.h&quot;      &quot;ph01mcacl2.l&quot;    
+[139] &quot;ph01mcacl2.r&quot;     &quot;ph01mcacl2.h&quot;     &quot;freeiron.l&quot;      
+[142] &quot;freeiron.r&quot;       &quot;freeiron.h&quot;       &quot;feoxalate.l&quot;     
+[145] &quot;feoxalate.r&quot;      &quot;feoxalate.h&quot;      &quot;extracid.l&quot;      
+[148] &quot;extracid.r&quot;       &quot;extracid.h&quot;       &quot;extral.l&quot;        
+[151] &quot;extral.r&quot;         &quot;extral.h&quot;         &quot;aloxalate.l&quot;     
+[154] &quot;aloxalate.r&quot;      &quot;aloxalate.h&quot;      &quot;pbray1.l&quot;        
+[157] &quot;pbray1.r&quot;         &quot;pbray1.h&quot;         &quot;poxalate.l&quot;      
+[160] &quot;poxalate.r&quot;       &quot;poxalate.h&quot;       &quot;ph2osoluble.l&quot;   
+[163] &quot;ph2osoluble.r&quot;    &quot;ph2osoluble.h&quot;    &quot;ptotal.l&quot;        
+[166] &quot;ptotal.r&quot;         &quot;ptotal.h&quot;         &quot;excavdifcl&quot;      
+[169] &quot;excavdifms&quot;       &quot;cokey&quot;            &quot;chkey&quot;           </code></pre>
+<pre class="r"><code># select only variables of interest. Reference SSURGO_Metadata
+horizon &lt;- horizon %&gt;%
+  dplyr::select(hzdepb.r, hzdept.r, cokey, sandtotal.r, silttotal.r, claytotal.r, om.r, ksat.r, cec7.r, ph1to1h2o.r, awc.r)
+
+summary(horizon)</code></pre>
+<pre><code>    hzdepb.r         hzdept.r          cokey           sandtotal.r   
+ Min.   :  2.00   Min.   : 0.000   Min.   :18038318   Min.   : 0.00  
+ 1st Qu.: 18.00   1st Qu.: 0.000   1st Qu.:19883226   1st Qu.:17.00  
+ Median : 25.00   Median : 8.000   Median :19943480   Median :50.00  
+ Mean   : 36.46   Mean   : 9.687   Mean   :19555557   Mean   :47.13  
+ 3rd Qu.: 48.00   3rd Qu.:20.000   3rd Qu.:19954805   3rd Qu.:69.10  
+ Max.   :208.00   Max.   :30.000   Max.   :20302650   Max.   :98.00  
+                                                      NA&#39;s   :1563   
+  silttotal.r     claytotal.r         om.r            ksat.r      
+ Min.   : 0.00   Min.   : 0.00   Min.   : 0.000   Min.   :  0.00  
+ 1st Qu.:16.30   1st Qu.: 5.00   1st Qu.: 0.750   1st Qu.:  9.17  
+ Median :34.00   Median :10.00   Median : 1.500   Median :  9.17  
+ Mean   :37.36   Mean   :12.02   Mean   : 7.496   Mean   : 32.57  
+ 3rd Qu.:60.80   3rd Qu.:16.00   3rd Qu.: 3.000   3rd Qu.: 28.23  
+ Max.   :90.00   Max.   :75.00   Max.   :95.000   Max.   :423.45  
+ NA&#39;s   :1676    NA&#39;s   :1449    NA&#39;s   :505      NA&#39;s   :40      
+     cec7.r        ph1to1h2o.r        awc.r       
+ Min.   :  0.00   Min.   :3.100   Min.   :0.0000  
+ 1st Qu.:  6.40   1st Qu.:5.300   1st Qu.:0.1200  
+ Median : 11.10   Median :5.800   Median :0.1600  
+ Mean   : 17.93   Mean   :5.815   Mean   :0.1792  
+ 3rd Qu.: 17.00   3rd Qu.:6.200   3rd Qu.:0.2100  
+ Max.   :190.00   Max.   :8.200   Max.   :0.6000  
+ NA&#39;s   :16185    NA&#39;s   :2622    NA&#39;s   :338     </code></pre>
+<pre class="r"><code>#weighted means for the top 30 inches
+horizon &lt;- horizon %&gt;%
+  mutate(thick = ifelse(hzdepb.r &gt; 30, 30 - hzdept.r, hzdepb.r - hzdept.r)) %&gt;%  
+  group_by(cokey) %&gt;%
+  summarise(sand = round(weighted.mean(sandtotal.r, thick, na.rm = TRUE),2),
+            silt = round(weighted.mean(silttotal.r, thick, na.rm = TRUE),2),
+            clay = round(weighted.mean(claytotal.r, thick, na.rm = TRUE),2),
+            om = round(weighted.mean(om.r, thick, na.rm = TRUE),2),
+            ksat = round(weighted.mean(ksat.r, thick, na.rm = TRUE),2),
+            cec = round(weighted.mean(cec7.r, thick, na.rm = TRUE),2),
+            ph = round(weighted.mean(ph1to1h2o.r, thick, na.rm = TRUE),2),
+            awc = round(weighted.mean(awc.r, thick, na.rm = TRUE), 2)) 
+#add deepest soil depth back
+horizon &lt;- left_join(horizon, depth, by = &quot;cokey&quot;)</code></pre>
+</div>
+<div id="clean-component" class="section level2">
+<h2>Clean component</h2>
+<p>Select relevant variables and filter to component kind = Series.
+Filtering to series removes miscellaneous areas like water, landfills,
+coal mines.</p>
+<pre class="r"><code>names(component)</code></pre>
+<pre><code>  [1] &quot;comppct.l&quot;        &quot;comppct.r&quot;        &quot;comppct.h&quot;       
+  [4] &quot;compname&quot;         &quot;compkind&quot;         &quot;majcompflag&quot;     
+  [7] &quot;otherph&quot;          &quot;localphase&quot;       &quot;slope.l&quot;         
+ [10] &quot;slope.r&quot;          &quot;slope.h&quot;          &quot;slopelenusle.l&quot;  
+ [13] &quot;slopelenusle.r&quot;   &quot;slopelenusle.h&quot;   &quot;runoff&quot;          
+ [16] &quot;tfact&quot;            &quot;wei&quot;              &quot;weg&quot;             
+ [19] &quot;erocl&quot;            &quot;earthcovkind1&quot;    &quot;earthcovkind2&quot;   
+ [22] &quot;hydricon&quot;         &quot;hydricrating&quot;     &quot;drainagecl&quot;      
+ [25] &quot;elev.l&quot;           &quot;elev.r&quot;           &quot;elev.h&quot;          
+ [28] &quot;aspectccwise&quot;     &quot;aspectrep&quot;        &quot;aspectcwise&quot;     
+ [31] &quot;geomdesc&quot;         &quot;albedodry.l&quot;      &quot;albedodry.r&quot;     
+ [34] &quot;albedodry.h&quot;      &quot;airtempa.l&quot;       &quot;airtempa.r&quot;      
+ [37] &quot;airtempa.h&quot;       &quot;map.l&quot;            &quot;map.r&quot;           
+ [40] &quot;map.h&quot;            &quot;reannualprecip.l&quot; &quot;reannualprecip.r&quot;
+ [43] &quot;reannualprecip.h&quot; &quot;ffd.l&quot;            &quot;ffd.r&quot;           
+ [46] &quot;ffd.h&quot;            &quot;nirrcapcl&quot;        &quot;nirrcapscl&quot;      
+ [49] &quot;nirrcapunit&quot;      &quot;irrcapcl&quot;         &quot;irrcapscl&quot;       
+ [52] &quot;irrcapunit&quot;       &quot;cropprodindex&quot;    &quot;constreeshrubgrp&quot;
+ [55] &quot;wndbrksuitgrp&quot;    &quot;rsprod.l&quot;         &quot;rsprod.r&quot;        
+ [58] &quot;rsprod.h&quot;         &quot;foragesuitgrpid&quot;  &quot;wlgrain&quot;         
+ [61] &quot;wlgrass&quot;          &quot;wlherbaceous&quot;     &quot;wlshrub&quot;         
+ [64] &quot;wlconiferous&quot;     &quot;wlhardwood&quot;       &quot;wlwetplant&quot;      
+ [67] &quot;wlshallowwat&quot;     &quot;wlrangeland&quot;      &quot;wlopenland&quot;      
+ [70] &quot;wlwoodland&quot;       &quot;wlwetland&quot;        &quot;soilslippot&quot;     
+ [73] &quot;frostact&quot;         &quot;initsub.l&quot;        &quot;initsub.r&quot;       
+ [76] &quot;initsub.h&quot;        &quot;totalsub.l&quot;       &quot;totalsub.r&quot;      
+ [79] &quot;totalsub.h&quot;       &quot;hydgrp&quot;           &quot;corcon&quot;          
+ [82] &quot;corsteel&quot;         &quot;taxclname&quot;        &quot;taxorder&quot;        
+ [85] &quot;taxsuborder&quot;      &quot;taxgrtgroup&quot;      &quot;taxsubgrp&quot;       
+ [88] &quot;taxpartsize&quot;      &quot;taxpartsizemod&quot;   &quot;taxceactcl&quot;      
+ [91] &quot;taxreaction&quot;      &quot;taxtempcl&quot;        &quot;taxmoistscl&quot;     
+ [94] &quot;taxtempregime&quot;    &quot;soiltaxedition&quot;   &quot;castorieindex&quot;   
+ [97] &quot;flecolcomnum&quot;     &quot;flhe&quot;             &quot;flphe&quot;           
+[100] &quot;flsoilleachpot&quot;   &quot;flsoirunoffpot&quot;   &quot;fltemik2use&quot;     
+[103] &quot;fltriumph2use&quot;    &quot;indraingrp&quot;       &quot;innitrateleachi&quot; 
+[106] &quot;misoimgmtgrp&quot;     &quot;vasoimgtgrp&quot;      &quot;mukey&quot;           
+[109] &quot;cokey&quot;            &quot;county&quot;          </code></pre>
+<pre class="r"><code>component &lt;- component %&gt;%
+  dplyr::select(c(compname, compkind, slope = slope.r, elev = elev.r, mukey, cokey, county)) %&gt;%
+  filter(compkind == &quot;Series&quot;) %&gt;%
+  droplevels()
+str(component)</code></pre>
+<pre><code>&#39;data.frame&#39;:   24716 obs. of  7 variables:
+ $ compname: chr  &quot;Ossineke&quot; &quot;Solona&quot; &quot;Longrie&quot; &quot;Nadeau&quot; ...
+ $ compkind: chr  &quot;Series&quot; &quot;Series&quot; &quot;Series&quot; &quot;Series&quot; ...
+ $ slope   : num  2 2 2 16 16 16 16 9 9 2 ...
+ $ elev    : int  290 290 290 290 290 290 290 290 290 290 ...
+ $ mukey   : int  2861497 2861497 2861497 2861498 2861498 2861498 2861498 2861499 2861499 2861499 ...
+ $ cokey   : int  18040046 18040047 18040048 18040036 18040038 18040039 18040040 18040031 18040032 18040033 ...
+ $ county  : chr  &quot;Brown&quot; &quot;Brown&quot; &quot;Brown&quot; &quot;Brown&quot; ...</code></pre>
+</div>
+<div id="clean-mapunit" class="section level2">
+<h2>Clean mapunit</h2>
+<pre class="r"><code># names(mapunit)
+# mapunit &lt;- mapunit %&gt;%
+#   dplyr::select(c(mukey, county))</code></pre>
+</div>
+<div id="clean-crop-yields" class="section level2">
+<h2>Clean crop yields</h2>
+<pre class="r"><code>names(cocropyld)</code></pre>
+<pre><code> [1] &quot;cropname&quot;      &quot;yldunits&quot;      &quot;nonirryield.l&quot; &quot;nonirryield.r&quot;
+ [5] &quot;nonirryield.h&quot; &quot;irryield.l&quot;    &quot;irryield.r&quot;    &quot;irryield.h&quot;   
+ [9] &quot;cropprodindex&quot; &quot;vasoiprdgrp&quot;   &quot;cokey&quot;         &quot;cocropyldkey&quot; </code></pre>
+<pre class="r"><code>cocropyld &lt;- cocropyld %&gt;%
+  dplyr::select(cropname, yldunits, nonirryield.r, cokey)
+levels(as.factor(cocropyld$cropname))</code></pre>
+<pre><code> [1] &quot;Alfalfa hay&quot;                  &quot;Barley&quot;                      
+ [3] &quot;Bluegrass-white clover&quot;       &quot;Bromegrass hay&quot;              
+ [5] &quot;Bromegrass-alfalfa&quot;           &quot;Bromegrass-alfalfa hay&quot;      
+ [7] &quot;Canning peas&quot;                 &quot;Cool-season grasses&quot;         
+ [9] &quot;Corn&quot;                         &quot;Corn silage&quot;                 
+[11] &quot;Grass hay&quot;                    &quot;Grass-clover&quot;                
+[13] &quot;Grass-legume hay&quot;             &quot;Grass-legume pasture&quot;        
+[15] &quot;Improved permanent pasture&quot;   &quot;Irish potatoes&quot;              
+[17] &quot;Kentucky bluegrass&quot;           &quot;Oats&quot;                        
+[19] &quot;Orchardgrass-alsike&quot;          &quot;Orchardgrass-red clover&quot;     
+[21] &quot;Pasture&quot;                      &quot;Red clover hay&quot;              
+[23] &quot;Reed canarygrass&quot;             &quot;Smooth bromegrass&quot;           
+[25] &quot;Snap beans&quot;                   &quot;Soybeans&quot;                    
+[27] &quot;Spring wheat&quot;                 &quot;Sunflowers&quot;                  
+[29] &quot;Sweet corn&quot;                   &quot;Timothy-alsike&quot;              
+[31] &quot;Timothy-red clover hay&quot;       &quot;Trefoil hay&quot;                 
+[33] &quot;Unimproved permanent pasture&quot; &quot;Warm season grasses&quot;         
+[35] &quot;Wheat&quot;                        &quot;Winter wheat&quot;                </code></pre>
+<pre class="r"><code># filter to grasses/pasture with species names
+grass_clover&lt;- c(&quot;Bluegrass-white clover&quot;, &quot;Orchardgrass-alsike&quot;, &quot;Orchardgrass-red clover&quot;, &quot;Timothy-alsike&quot;)
+cocropyld &lt;- cocropyld %&gt;%
+  filter(cropname %in% grass_clover) %&gt;%
+  drop_na()
+
+summary(cocropyld)</code></pre>
+<pre><code>   cropname           yldunits         nonirryield.r        cokey         
+ Length:30390       Length:30390       Min.   : 0.000   Min.   :18038418  
+ Class :character   Class :character   1st Qu.: 1.800   1st Qu.:19884580  
+ Mode  :character   Mode  :character   Median : 2.600   Median :19943087  
+                                       Mean   : 2.635   Mean   :19565120  
+                                       3rd Qu.: 3.400   3rd Qu.:19954677  
+                                       Max.   :18.000   Max.   :20302635  </code></pre>
+<pre class="r"><code># how many observations
+cocropyld %&gt;%
+  group_by(cropname) %&gt;%
+  tally() %&gt;%
+  arrange(n)</code></pre>
+<pre><code># A tibble: 4 × 2
+  cropname                    n
+  &lt;chr&gt;                   &lt;int&gt;
+1 Timothy-alsike           7387
+2 Orchardgrass-red clover  7443
+3 Orchardgrass-alsike      7451
+4 Bluegrass-white clover   8109</code></pre>
+</div>
+<div id="join-tables" class="section level2">
+<h2>Join tables</h2>
+<pre class="r"><code>cropData &lt;- left_join(component, horizon) %&gt;%
+  #left_join(mapunit) %&gt;%
+  left_join(cocropyld) %&gt;%
+  drop_na() %&gt;%
+  distinct() # remove duplicates</code></pre>
+<pre><code>Joining, by = &quot;cokey&quot;
+Joining, by = &quot;cokey&quot;</code></pre>
+</div>
+<div id="save-data-to-file" class="section level2">
+<h2>Save data to file</h2>
+<pre class="r"><code>write.csv(cropData, &quot;output/cropData.csv&quot;, row.names = FALSE, quote = FALSE)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur/Monterey 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] forcats_0.5.1   stringr_1.4.0   dplyr_1.0.8     purrr_0.3.4    
+ [5] readr_2.1.2     tidyr_1.2.0     tibble_3.1.6    ggplot2_3.3.5  
+ [9] tidyverse_1.3.1 workflowr_1.7.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.8.3     lubridate_1.8.0  getPass_0.2-2    ps_1.7.0        
+ [5] assertthat_0.2.1 rprojroot_2.0.3  digest_0.6.29    utf8_1.2.2      
+ [9] R6_2.5.1         cellranger_1.1.0 backports_1.4.1  reprex_2.0.1    
+[13] evaluate_0.15    httr_1.4.2       pillar_1.7.0     rlang_1.0.4     
+[17] readxl_1.4.0     rstudioapi_0.13  whisker_0.4      callr_3.7.0     
+[21] jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0    broom_0.8.0     
+[25] compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8     xfun_0.30       
+[29] pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2 fansi_1.0.3     
+[33] withr_2.5.0      crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1    
+[37] later_1.3.0      grid_4.2.0       jsonlite_1.8.0   gtable_0.3.0    
+[41] lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1     magrittr_2.0.3  
+[45] scales_1.2.0     cli_3.3.0        stringi_1.7.6    fs_1.5.2        
+[49] promises_1.2.0.1 xml2_1.3.3       bslib_0.3.1      ellipsis_0.3.2  
+[53] generics_0.1.2   vctrs_0.4.1      tools_4.2.0      glue_1.6.2      
+[57] hms_1.1.1        processx_3.5.3   fastmap_1.1.0    yaml_2.3.5      
+[61] colorspace_2.0-3 rvest_1.0.2      knitr_1.39       haven_2.5.0     
+[65] sass_0.4.1      </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

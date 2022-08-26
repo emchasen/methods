@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="emchasen" />
+
+<meta name="date" content="2022-08-24" />
+
+<title>createModel</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Pasture Model</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">createModel</h1>
+<h4 class="author">emchasen</h4>
+<h4 class="date">2022-08-24</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-08-26
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>methods/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220103code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20220103)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220103code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220103)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong8247efd">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong> 8247efd
+</a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong8247efd"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version 8247efd.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+
+Untracked files:
+    Untracked:  analysis/rsconnect/
+    Untracked:  cropData.csv
+    Untracked:  data/Adams_SSURGO_chorizon.csv
+    Untracked:  data/Adams_SSURGO_cocropyld.csv
+    Untracked:  data/Adams_SSURGO_component.csv
+    Untracked:  data/Adams_SSURGO_mapunit.csv
+    Untracked:  data/Ashland_SSURGO_chorizon.csv
+    Untracked:  data/Ashland_SSURGO_cocropyld.csv
+    Untracked:  data/Ashland_SSURGO_component.csv
+    Untracked:  data/Ashland_SSURGO_mapunit.csv
+    Untracked:  data/Barron_SSURGO_chorizon.csv
+    Untracked:  data/Barron_SSURGO_cocropyld.csv
+    Untracked:  data/Barron_SSURGO_component.csv
+    Untracked:  data/Barron_SSURGO_mapunit.csv
+    Untracked:  data/Bayfield_SSURGO_chorizon.csv
+    Untracked:  data/Bayfield_SSURGO_cocropyld.csv
+    Untracked:  data/Bayfield_SSURGO_component.csv
+    Untracked:  data/Bayfield_SSURGO_mapunit.csv
+    Untracked:  data/Brown_SSURGO_chorizon.csv
+    Untracked:  data/Brown_SSURGO_cocropyld.csv
+    Untracked:  data/Brown_SSURGO_component.csv
+    Untracked:  data/Brown_SSURGO_mapunit.csv
+    Untracked:  data/Buffalo_SSURGO_chorizon.csv
+    Untracked:  data/Buffalo_SSURGO_cocropyld.csv
+    Untracked:  data/Buffalo_SSURGO_component.csv
+    Untracked:  data/Buffalo_SSURGO_mapunit.csv
+    Untracked:  data/Burnett_SSURGO_chorizon.csv
+    Untracked:  data/Burnett_SSURGO_cocropyld.csv
+    Untracked:  data/Burnett_SSURGO_component.csv
+    Untracked:  data/Burnett_SSURGO_mapunit.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_chorizon.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_cocropyld.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_component.csv
+    Untracked:  data/CalumetManitowoc_SSURGO_mapunit.csv
+    Untracked:  data/Chippewa_SSURGO_chorizon.csv
+    Untracked:  data/Chippewa_SSURGO_cocropyld.csv
+    Untracked:  data/Chippewa_SSURGO_component.csv
+    Untracked:  data/Chippewa_SSURGO_mapunit.csv
+    Untracked:  data/Clark_SSURGO_chorizon.csv
+    Untracked:  data/Clark_SSURGO_cocropyld.csv
+    Untracked:  data/Clark_SSURGO_component.csv
+    Untracked:  data/Clark_SSURGO_mapunit.csv
+    Untracked:  data/Columbia_SSURGO_chorizon.csv
+    Untracked:  data/Columbia_SSURGO_cocropyld.csv
+    Untracked:  data/Columbia_SSURGO_component.csv
+    Untracked:  data/Columbia_SSURGO_mapunit.csv
+    Untracked:  data/Crawford_SSURGO_chorizon.csv
+    Untracked:  data/Crawford_SSURGO_cocropyld.csv
+    Untracked:  data/Crawford_SSURGO_component.csv
+    Untracked:  data/Crawford_SSURGO_mapunit.csv
+    Untracked:  data/Dane_SSURGO_chorizon.csv
+    Untracked:  data/Dane_SSURGO_cocropyld.csv
+    Untracked:  data/Dane_SSURGO_component.csv
+    Untracked:  data/Dane_SSURGO_mapunit.csv
+    Untracked:  data/Dodge_SSURGO_chorizon.csv
+    Untracked:  data/Dodge_SSURGO_cocropyld.csv
+    Untracked:  data/Dodge_SSURGO_component.csv
+    Untracked:  data/Dodge_SSURGO_mapunit.csv
+    Untracked:  data/Door_SSURGO_chorizon.csv
+    Untracked:  data/Door_SSURGO_cocropyld.csv
+    Untracked:  data/Door_SSURGO_component.csv
+    Untracked:  data/Door_SSURGO_mapunit.csv
+    Untracked:  data/Douglas_SSURGO_chorizon.csv
+    Untracked:  data/Douglas_SSURGO_cocropyld.csv
+    Untracked:  data/Douglas_SSURGO_component.csv
+    Untracked:  data/Douglas_SSURGO_mapunit.csv
+    Untracked:  data/Dunn_SSURGO_chorizon.csv
+    Untracked:  data/Dunn_SSURGO_cocropyld.csv
+    Untracked:  data/Dunn_SSURGO_component.csv
+    Untracked:  data/Dunn_SSURGO_mapunit.csv
+    Untracked:  data/EauClaire_SSURGO_chorizon.csv
+    Untracked:  data/EauClaire_SSURGO_cocropyld.csv
+    Untracked:  data/EauClaire_SSURGO_component.csv
+    Untracked:  data/EauClaire_SSURGO_mapunit.csv
+    Untracked:  data/Florence_SSURGO_chorizon.csv
+    Untracked:  data/Florence_SSURGO_cocropyld.csv
+    Untracked:  data/Florence_SSURGO_component.csv
+    Untracked:  data/Florence_SSURGO_mapunit.csv
+    Untracked:  data/FondDuLac_SSURGO_chorizon.csv
+    Untracked:  data/FondDuLac_SSURGO_cocropyld.csv
+    Untracked:  data/FondDuLac_SSURGO_component.csv
+    Untracked:  data/FondDuLac_SSURGO_mapunit.csv
+    Untracked:  data/Forest_SSURGO_chorizon.csv
+    Untracked:  data/Forest_SSURGO_cocropyld.csv
+    Untracked:  data/Forest_SSURGO_component.csv
+    Untracked:  data/Forest_SSURGO_mapunit.csv
+    Untracked:  data/Grant_SSURGO_chorizon.csv
+    Untracked:  data/Grant_SSURGO_cocropyld.csv
+    Untracked:  data/Grant_SSURGO_component.csv
+    Untracked:  data/Grant_SSURGO_mapunit.csv
+    Untracked:  data/GreenLake_SSURGO_chorizon.csv
+    Untracked:  data/GreenLake_SSURGO_cocropyld.csv
+    Untracked:  data/GreenLake_SSURGO_component.csv
+    Untracked:  data/GreenLake_SSURGO_mapunit.csv
+    Untracked:  data/Green_SSURGO_chorizon.csv
+    Untracked:  data/Green_SSURGO_cocropyld.csv
+    Untracked:  data/Green_SSURGO_component.csv
+    Untracked:  data/Green_SSURGO_mapunit.csv
+    Untracked:  data/Iowa_SSURGO_chorizon.csv
+    Untracked:  data/Iowa_SSURGO_cocropyld.csv
+    Untracked:  data/Iowa_SSURGO_component.csv
+    Untracked:  data/Iowa_SSURGO_mapunit.csv
+    Untracked:  data/Iron_SSURGO_chorizon.csv
+    Untracked:  data/Iron_SSURGO_cocropyld.csv
+    Untracked:  data/Iron_SSURGO_component.csv
+    Untracked:  data/Iron_SSURGO_mapunit.csv
+    Untracked:  data/Jackson_SSURGO_chorizon.csv
+    Untracked:  data/Jackson_SSURGO_cocropyld.csv
+    Untracked:  data/Jackson_SSURGO_component.csv
+    Untracked:  data/Jackson_SSURGO_mapunit.csv
+    Untracked:  data/Jefferson_SSURGO_chorizon.csv
+    Untracked:  data/Jefferson_SSURGO_cocropyld.csv
+    Untracked:  data/Jefferson_SSURGO_component.csv
+    Untracked:  data/Jefferson_SSURGO_mapunit.csv
+    Untracked:  data/Juneau_SSURGO_chorizon.csv
+    Untracked:  data/Juneau_SSURGO_cocropyld.csv
+    Untracked:  data/Juneau_SSURGO_component.csv
+    Untracked:  data/Juneau_SSURGO_mapunit.csv
+    Untracked:  data/KenoshaRacine_SSURGO_chorizon.csv
+    Untracked:  data/KenoshaRacine_SSURGO_cocropyld.csv
+    Untracked:  data/KenoshaRacine_SSURGO_component.csv
+    Untracked:  data/KenoshaRacine_SSURGO_mapunit.csv
+    Untracked:  data/Kewaunee_SSURGO_chorizon.csv
+    Untracked:  data/Kewaunee_SSURGO_cocropyld.csv
+    Untracked:  data/Kewaunee_SSURGO_component.csv
+    Untracked:  data/Kewaunee_SSURGO_mapunit.csv
+    Untracked:  data/LaCrosse_SSURGO_chorizon.csv
+    Untracked:  data/LaCrosse_SSURGO_cocropyld.csv
+    Untracked:  data/LaCrosse_SSURGO_component.csv
+    Untracked:  data/LaCrosse_SSURGO_mapunit.csv
+    Untracked:  data/Lafayette_SSURGO_chorizon.csv
+    Untracked:  data/Lafayette_SSURGO_cocropyld.csv
+    Untracked:  data/Lafayette_SSURGO_component.csv
+    Untracked:  data/Lafayette_SSURGO_mapunit.csv
+    Untracked:  data/Langlade_SSURGO_chorizon.csv
+    Untracked:  data/Langlade_SSURGO_cocropyld.csv
+    Untracked:  data/Langlade_SSURGO_component.csv
+    Untracked:  data/Langlade_SSURGO_mapunit.csv
+    Untracked:  data/Lincoln_SSURGO_chorizon.csv
+    Untracked:  data/Lincoln_SSURGO_cocropyld.csv
+    Untracked:  data/Lincoln_SSURGO_component.csv
+    Untracked:  data/Lincoln_SSURGO_mapunit.csv
+    Untracked:  data/Manitowoc_SSURGO_chorizon.csv
+    Untracked:  data/Manitowoc_SSURGO_cocropyld.csv
+    Untracked:  data/Manitowoc_SSURGO_component.csv
+    Untracked:  data/Manitowoc_SSURGO_mapunit.csv
+    Untracked:  data/Marathon_SSURGO_chorizon.csv
+    Untracked:  data/Marathon_SSURGO_cocropyld.csv
+    Untracked:  data/Marathon_SSURGO_component.csv
+    Untracked:  data/Marathon_SSURGO_mapunit.csv
+    Untracked:  data/Marinette_SSURGO_chorizon.csv
+    Untracked:  data/Marinette_SSURGO_cocropyld.csv
+    Untracked:  data/Marinette_SSURGO_component.csv
+    Untracked:  data/Marinette_SSURGO_mapunit.csv
+    Untracked:  data/Marquette_SSURGO_chorizon.csv
+    Untracked:  data/Marquette_SSURGO_cocropyld.csv
+    Untracked:  data/Marquette_SSURGO_component.csv
+    Untracked:  data/Marquette_SSURGO_mapunit.csv
+    Untracked:  data/Menominee_SSURGO_chorizon.csv
+    Untracked:  data/Menominee_SSURGO_cocropyld.csv
+    Untracked:  data/Menominee_SSURGO_component.csv
+    Untracked:  data/Menominee_SSURGO_mapunit.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_chorizon.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_cocropyld.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_component.csv
+    Untracked:  data/MilwaukeeWaukesha_SSURGO_mapunit.csv
+    Untracked:  data/Monroe_SSURGO_chorizon.csv
+    Untracked:  data/Monroe_SSURGO_cocropyld.csv
+    Untracked:  data/Monroe_SSURGO_component.csv
+    Untracked:  data/Monroe_SSURGO_mapunit.csv
+    Untracked:  data/Oconto_SSURGO_chorizon.csv
+    Untracked:  data/Oconto_SSURGO_cocropyld.csv
+    Untracked:  data/Oconto_SSURGO_component.csv
+    Untracked:  data/Oconto_SSURGO_mapunit.csv
+    Untracked:  data/Oneida_SSURGO_chorizon.csv
+    Untracked:  data/Oneida_SSURGO_cocropyld.csv
+    Untracked:  data/Oneida_SSURGO_component.csv
+    Untracked:  data/Oneida_SSURGO_mapunit.csv
+    Untracked:  data/Outagamie_SSURGO_chorizon.csv
+    Untracked:  data/Outagamie_SSURGO_cocropyld.csv
+    Untracked:  data/Outagamie_SSURGO_component.csv
+    Untracked:  data/Outagamie_SSURGO_mapunit.csv
+    Untracked:  data/Ozaukee_SSURGO_chorizon.csv
+    Untracked:  data/Ozaukee_SSURGO_cocropyld.csv
+    Untracked:  data/Ozaukee_SSURGO_component.csv
+    Untracked:  data/Ozaukee_SSURGO_mapunit.csv
+    Untracked:  data/Pepin_SSURGO_chorizon.csv
+    Untracked:  data/Pepin_SSURGO_cocropyld.csv
+    Untracked:  data/Pepin_SSURGO_component.csv
+    Untracked:  data/Pepin_SSURGO_mapunit.csv
+    Untracked:  data/Pierce_SSURGO_chorizon.csv
+    Untracked:  data/Pierce_SSURGO_cocropyld.csv
+    Untracked:  data/Pierce_SSURGO_component.csv
+    Untracked:  data/Pierce_SSURGO_mapunit.csv
+    Untracked:  data/Polk_SSURGO_chorizon.csv
+    Untracked:  data/Polk_SSURGO_cocropyld.csv
+    Untracked:  data/Polk_SSURGO_component.csv
+    Untracked:  data/Polk_SSURGO_mapunit.csv
+    Untracked:  data/Portage_SSURGO_chorizon.csv
+    Untracked:  data/Portage_SSURGO_cocropyld.csv
+    Untracked:  data/Portage_SSURGO_component.csv
+    Untracked:  data/Portage_SSURGO_mapunit.csv
+    Untracked:  data/Price_SSURGO_chorizon.csv
+    Untracked:  data/Price_SSURGO_cocropyld.csv
+    Untracked:  data/Price_SSURGO_component.csv
+    Untracked:  data/Price_SSURGO_mapunit.csv
+    Untracked:  data/Richland_SSURGO_chorizon.csv
+    Untracked:  data/Richland_SSURGO_cocropyld.csv
+    Untracked:  data/Richland_SSURGO_component.csv
+    Untracked:  data/Richland_SSURGO_mapunit.csv
+    Untracked:  data/Rock_SSURGO_chorizon.csv
+    Untracked:  data/Rock_SSURGO_cocropyld.csv
+    Untracked:  data/Rock_SSURGO_component.csv
+    Untracked:  data/Rock_SSURGO_mapunit.csv
+    Untracked:  data/Rusk_SSURGO_chorizon.csv
+    Untracked:  data/Rusk_SSURGO_cocropyld.csv
+    Untracked:  data/Rusk_SSURGO_component.csv
+    Untracked:  data/Rusk_SSURGO_mapunit.csv
+    Untracked:  data/Sauk_SSURGO_chorizon.csv
+    Untracked:  data/Sauk_SSURGO_cocropyld.csv
+    Untracked:  data/Sauk_SSURGO_component.csv
+    Untracked:  data/Sauk_SSURGO_mapunit.csv
+    Untracked:  data/Sawyer_SSURGO_chorizon.csv
+    Untracked:  data/Sawyer_SSURGO_cocropyld.csv
+    Untracked:  data/Sawyer_SSURGO_component.csv
+    Untracked:  data/Sawyer_SSURGO_mapunit.csv
+    Untracked:  data/Shawano_SSURGO_chorizon.csv
+    Untracked:  data/Shawano_SSURGO_cocropyld.csv
+    Untracked:  data/Shawano_SSURGO_component.csv
+    Untracked:  data/Shawano_SSURGO_mapunit.csv
+    Untracked:  data/Sheboygan_SSURGO_chorizon.csv
+    Untracked:  data/Sheboygan_SSURGO_cocropyld.csv
+    Untracked:  data/Sheboygan_SSURGO_component.csv
+    Untracked:  data/Sheboygan_SSURGO_mapunit.csv
+    Untracked:  data/StCroix_SSURGO_chorizon.csv
+    Untracked:  data/StCroix_SSURGO_cocropyld.csv
+    Untracked:  data/StCroix_SSURGO_component.csv
+    Untracked:  data/StCroix_SSURGO_mapunit.csv
+    Untracked:  data/Taylor_SSURGO_chorizon.csv
+    Untracked:  data/Taylor_SSURGO_cocropyld.csv
+    Untracked:  data/Taylor_SSURGO_component.csv
+    Untracked:  data/Taylor_SSURGO_mapunit.csv
+    Untracked:  data/Trempealeau_SSURGO_chorizon.csv
+    Untracked:  data/Trempealeau_SSURGO_cocropyld.csv
+    Untracked:  data/Trempealeau_SSURGO_component.csv
+    Untracked:  data/Trempealeau_SSURGO_mapunit.csv
+    Untracked:  data/Vernon_SSURGO_chorizon.csv
+    Untracked:  data/Vernon_SSURGO_cocropyld.csv
+    Untracked:  data/Vernon_SSURGO_component.csv
+    Untracked:  data/Vernon_SSURGO_mapunit.csv
+    Untracked:  data/Vilas_SSURGO_chorizon.csv
+    Untracked:  data/Vilas_SSURGO_cocropyld.csv
+    Untracked:  data/Vilas_SSURGO_component.csv
+    Untracked:  data/Vilas_SSURGO_mapunit.csv
+    Untracked:  data/Walworth_SSURGO_chorizon.csv
+    Untracked:  data/Walworth_SSURGO_cocropyld.csv
+    Untracked:  data/Walworth_SSURGO_component.csv
+    Untracked:  data/Walworth_SSURGO_mapunit.csv
+    Untracked:  data/Washburn_SSURGO_chorizon.csv
+    Untracked:  data/Washburn_SSURGO_cocropyld.csv
+    Untracked:  data/Washburn_SSURGO_component.csv
+    Untracked:  data/Washburn_SSURGO_mapunit.csv
+    Untracked:  data/Washington_SSURGO_chorizon.csv
+    Untracked:  data/Washington_SSURGO_cocropyld.csv
+    Untracked:  data/Washington_SSURGO_component.csv
+    Untracked:  data/Washington_SSURGO_mapunit.csv
+    Untracked:  data/Waupaca_SSURGO_chorizon.csv
+    Untracked:  data/Waupaca_SSURGO_cocropyld.csv
+    Untracked:  data/Waupaca_SSURGO_component.csv
+    Untracked:  data/Waupaca_SSURGO_mapunit.csv
+    Untracked:  data/Waushara_SSURGO_chorizon.csv
+    Untracked:  data/Waushara_SSURGO_cocropyld.csv
+    Untracked:  data/Waushara_SSURGO_component.csv
+    Untracked:  data/Waushara_SSURGO_mapunit.csv
+    Untracked:  data/Winnebago_SSURGO_chorizon.csv
+    Untracked:  data/Winnebago_SSURGO_cocropyld.csv
+    Untracked:  data/Winnebago_SSURGO_component.csv
+    Untracked:  data/Winnebago_SSURGO_mapunit.csv
+    Untracked:  data/Wood_SSURGO_chorizon.csv
+    Untracked:  data/Wood_SSURGO_cocropyld.csv
+    Untracked:  data/Wood_SSURGO_component.csv
+    Untracked:  data/Wood_SSURGO_mapunit.csv
+    Untracked:  output/cropData.csv
+    Untracked:  output/grass_pred.rds
+
+Unstaged changes:
+    Modified:   .Rprofile
+    Modified:   .gitattributes
+    Modified:   .gitignore
+    Modified:   README.md
+    Modified:   _workflowr.yml
+    Modified:   analysis/_site.yml
+    Modified:   code/README.md
+    Modified:   data/README.md
+    Modified:   methods.Rproj
+    Modified:   output/README.md
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/createModel.Rmd</code>) and HTML
+(<code>docs/createModel.html</code>) files. If you’ve configured a
+remote Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+8247efd
+</td>
+<td>
+emchasen
+</td>
+<td>
+2022-08-26
+</td>
+<td>
+Publish the second files
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="use-randomforest-engine-with-the-tidyverse-to-tune-the-model"
+class="section level2">
+<h2>Use randomForest engine with the tidyverse to tune the model</h2>
+<pre class="r"><code>library(tidyverse) </code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.6     ✔ dplyr   1.0.8
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(tidymodels)</code></pre>
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 0.2.0 ──</code></pre>
+<pre><code>✔ broom        0.8.0     ✔ rsample      0.1.1
+✔ dials        0.1.1     ✔ tune         0.2.0
+✔ infer        1.0.0     ✔ workflows    0.2.6
+✔ modeldata    0.1.1     ✔ workflowsets 0.2.1
+✔ parsnip      0.2.1     ✔ yardstick    0.0.9
+✔ recipes      0.2.0     </code></pre>
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ scales::discard() masks purrr::discard()
+✖ dplyr::filter()   masks stats::filter()
+✖ recipes::fixed()  masks stringr::fixed()
+✖ dplyr::lag()      masks stats::lag()
+✖ yardstick::spec() masks readr::spec()
+✖ recipes::step()   masks stats::step()
+• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
+<pre class="r"><code>library(randomForest)</code></pre>
+<pre><code>randomForest 4.7-1</code></pre>
+<pre><code>Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>
+Attaching package: &#39;randomForest&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:dplyr&#39;:
+
+    combine</code></pre>
+<pre><code>The following object is masked from &#39;package:ggplot2&#39;:
+
+    margin</code></pre>
+</div>
+<div id="upload-data-from-all-of-wi" class="section level1">
+<h1>upload data from all of WI</h1>
+<pre class="r"><code>soil &lt;- read.csv(&quot;output/cropdata.csv&quot;)
+summary(soil)</code></pre>
+<pre><code>   compname           compkind             slope             elev      
+ Length:24111       Length:24111       Min.   : 0.000   Min.   :204.0  
+ Class :character   Class :character   1st Qu.: 2.000   1st Qu.:290.0  
+ Mode  :character   Mode  :character   Median : 4.000   Median :320.0  
+                                       Mean   : 8.906   Mean   :335.9  
+                                       3rd Qu.:11.000   3rd Qu.:396.0  
+                                       Max.   :70.000   Max.   :775.0  
+     mukey             cokey             county               sand      
+ Min.   : 395779   Min.   :18038418   Length:24111       Min.   : 0.00  
+ 1st Qu.: 448525   1st Qu.:19884466   Class :character   1st Qu.:28.56  
+ Median :1703613   Median :19943098   Mode  :character   Median :61.03  
+ Mean   :1686140   Mean   :19556286                      Mean   :53.50  
+ 3rd Qu.:2518683   3rd Qu.:19954576                      3rd Qu.:67.65  
+ Max.   :3182375   Max.   :20302631                      Max.   :97.58  
+      silt            clay             om              ksat       
+ Min.   : 0.00   Min.   : 0.00   Min.   : 0.160   Min.   :  0.28  
+ 1st Qu.:20.02   1st Qu.: 5.90   1st Qu.: 1.170   1st Qu.:  9.17  
+ Median :32.43   Median :10.42   Median : 1.710   Median : 17.43  
+ Mean   :34.93   Mean   :10.87   Mean   : 2.493   Mean   : 32.45  
+ 3rd Qu.:54.87   3rd Qu.:14.83   3rd Qu.: 2.210   3rd Qu.: 28.23  
+ Max.   :80.37   Max.   :58.50   Max.   :55.000   Max.   :263.17  
+      cec               ph             awc          total.depth   
+ Min.   :  1.47   Min.   :4.120   Min.   :0.0400   Min.   : 28.0  
+ 1st Qu.:  5.73   1st Qu.:5.610   1st Qu.:0.1300   1st Qu.:152.0  
+ Median :  9.00   Median :5.830   Median :0.1400   Median :185.0  
+ Mean   : 11.02   Mean   :5.922   Mean   :0.1592   Mean   :177.6  
+ 3rd Qu.: 13.31   3rd Qu.:6.200   3rd Qu.:0.2200   3rd Qu.:200.0  
+ Max.   :133.70   Max.   :7.700   Max.   :0.3700   Max.   :259.0  
+   cropname           yldunits         nonirryield.r   
+ Length:24111       Length:24111       Min.   : 1.000  
+ Class :character   Class :character   1st Qu.: 1.800  
+ Mode  :character   Mode  :character   Median : 2.600  
+                                       Mean   : 2.632  
+                                       3rd Qu.: 3.400  
+                                       Max.   :18.000  </code></pre>
+<pre class="r"><code>levels(as.factor(soil$cropname))</code></pre>
+<pre><code>[1] &quot;Bluegrass-white clover&quot;  &quot;Orchardgrass-alsike&quot;    
+[3] &quot;Orchardgrass-red clover&quot; &quot;Timothy-alsike&quot;         </code></pre>
+<pre class="r"><code>grass &lt;- soil %&gt;%
+  mutate(cropname = recode(cropname, 
+                           `Bluegrass-white clover`=&quot;Bluegrass-clover&quot;,
+                           `Orchardgrass-alsike`= &quot;Orchardgrass-clover&quot;,
+                           `Orchardgrass-red clover` = &quot;Orchardgrass-clover&quot;,
+                           `Timothy-alsike` = &quot;Timothy-clover&quot;)) %&gt;%
+  mutate_if(is.character, as.factor) %&gt;%
+  dplyr::select(c(cropname, yield = nonirryield.r, slope, elev, sand, silt,
+                  clay, om, ksat, cec, ph, awc, total.depth)) %&gt;%
+  filter(yield &lt; 10) %&gt;%
+  drop_na()
+summary(grass)</code></pre>
+<pre><code>                cropname         yield          slope             elev      
+ Bluegrass-clover   : 6406   Min.   :1.00   Min.   : 0.000   Min.   :204.0  
+ Orchardgrass-clover:11800   1st Qu.:1.80   1st Qu.: 2.000   1st Qu.:290.0  
+ Timothy-clover     : 5903   Median :2.60   Median : 4.000   Median :320.0  
+                             Mean   :2.63   Mean   : 8.906   Mean   :335.9  
+                             3rd Qu.:3.40   3rd Qu.:11.000   3rd Qu.:396.0  
+                             Max.   :5.60   Max.   :70.000   Max.   :775.0  
+      sand            silt            clay             om        
+ Min.   : 0.00   Min.   : 0.00   Min.   : 0.00   Min.   : 0.160  
+ 1st Qu.:28.56   1st Qu.:20.02   1st Qu.: 5.90   1st Qu.: 1.170  
+ Median :61.03   Median :32.43   Median :10.42   Median : 1.710  
+ Mean   :53.50   Mean   :34.93   Mean   :10.87   Mean   : 2.493  
+ 3rd Qu.:67.65   3rd Qu.:54.87   3rd Qu.:14.83   3rd Qu.: 2.210  
+ Max.   :97.58   Max.   :80.37   Max.   :58.50   Max.   :55.000  
+      ksat             cec               ph             awc        
+ Min.   :  0.28   Min.   :  1.47   Min.   :4.120   Min.   :0.0400  
+ 1st Qu.:  9.17   1st Qu.:  5.73   1st Qu.:5.610   1st Qu.:0.1300  
+ Median : 17.43   Median :  9.00   Median :5.830   Median :0.1400  
+ Mean   : 32.44   Mean   : 11.02   Mean   :5.922   Mean   :0.1592  
+ 3rd Qu.: 28.23   3rd Qu.: 13.31   3rd Qu.:6.200   3rd Qu.:0.2200  
+ Max.   :263.17   Max.   :133.70   Max.   :7.700   Max.   :0.3700  
+  total.depth   
+ Min.   : 28.0  
+ 1st Qu.:152.0  
+ Median :185.0  
+ Mean   :177.6  
+ 3rd Qu.:200.0  
+ Max.   :259.0  </code></pre>
+</div>
+<div id="begin-training" class="section level1">
+<h1>begin training</h1>
+<pre class="r"><code>set.seed(123)
+split &lt;- initial_split(grass, strata = yield, prop = 1/4) # small proportion for knit. usually 3/4
+train &lt;- training(split)
+test &lt;- testing(split)
+
+
+#recipe 
+grass_rec &lt;- recipe(yield ~ ., data = train)
+
+grass_prep &lt;- prep(grass_rec)
+juiced &lt;- juice(grass_prep)
+
+tune_spec &lt;- rand_forest(
+  mtry = tune(),
+  trees = tune(),
+  min_n = tune()
+) %&gt;%
+  set_mode(&quot;regression&quot;) %&gt;%
+  set_engine(&quot;randomForest&quot;)
+
+tune_wf &lt;- workflow() %&gt;%
+  add_recipe(grass_rec) %&gt;%
+  add_model(tune_spec)
+
+# train hyperparameters
+set.seed(234)
+folds &lt;- vfold_cv(train)
+
+doParallel::registerDoParallel()
+
+rf_grid &lt;- grid_regular(
+  mtry(range = c(3, 8)),
+  min_n(range = c(3, 8)),
+  trees(range = c(50,75)),
+  levels = 3
+)
+
+set.seed(456)
+regular_res &lt;- tune_grid(
+  tune_wf,
+  resamples = folds,
+  grid = rf_grid
+)
+
+#choose best model
+best_rmse &lt;- select_best(regular_res, &quot;rmse&quot;)
+
+best_rmse</code></pre>
+<pre><code># A tibble: 1 × 4
+   mtry trees min_n .config              
+  &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;                
+1     5    75     3 Preprocessor1_Model20</code></pre>
+<pre class="r"><code>final_rf &lt;- finalize_model(
+  tune_spec,
+  best_rmse
+)
+
+final_rf</code></pre>
+<pre><code>Random Forest Model Specification (regression)
+
+Main Arguments:
+  mtry = 5
+  trees = 75
+  min_n = 3
+
+Computational engine: randomForest </code></pre>
+<pre class="r"><code>mod &lt;- final_rf %&gt;%
+  set_engine(&quot;randomForest&quot;, importance = TRUE) %&gt;%
+  fit(yield ~ .,
+      data = train
+  )</code></pre>
+</div>
+<div id="save-model" class="section level1">
+<h1>save model</h1>
+<pre class="r"><code>saveRDS(mod, &quot;output/grass_pred.rds&quot;)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur/Monterey 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] randomForest_4.7-1 yardstick_0.0.9    workflowsets_0.2.1 workflows_0.2.6   
+ [5] tune_0.2.0         rsample_0.1.1      recipes_0.2.0      parsnip_0.2.1     
+ [9] modeldata_0.1.1    infer_1.0.0        dials_0.1.1        scales_1.2.0      
+[13] broom_0.8.0        tidymodels_0.2.0   forcats_0.5.1      stringr_1.4.0     
+[17] dplyr_1.0.8        purrr_0.3.4        readr_2.1.2        tidyr_1.2.0       
+[21] tibble_3.1.6       ggplot2_3.3.5      tidyverse_1.3.1    workflowr_1.7.0   
+
+loaded via a namespace (and not attached):
+ [1] colorspace_2.0-3   ellipsis_0.3.2     class_7.3-20       rprojroot_2.0.3   
+ [5] fs_1.5.2           rstudioapi_0.13    listenv_0.8.0      furrr_0.2.3       
+ [9] prodlim_2019.11.13 fansi_1.0.3        lubridate_1.8.0    xml2_1.3.3        
+[13] codetools_0.2-18   splines_4.2.0      doParallel_1.0.17  knitr_1.39        
+[17] jsonlite_1.8.0     pROC_1.18.0        dbplyr_2.1.1       compiler_4.2.0    
+[21] httr_1.4.2         backports_1.4.1    assertthat_0.2.1   Matrix_1.4-1      
+[25] fastmap_1.1.0      cli_3.3.0          later_1.3.0        htmltools_0.5.2   
+[29] tools_4.2.0        gtable_0.3.0       glue_1.6.2         Rcpp_1.0.8.3      
+[33] cellranger_1.1.0   jquerylib_0.1.4    DiceDesign_1.9     vctrs_0.4.1       
+[37] iterators_1.0.14   timeDate_3043.102  gower_1.0.0        xfun_0.30         
+[41] globals_0.14.0     ps_1.7.0           rvest_1.0.2        lifecycle_1.0.1   
+[45] future_1.25.0      getPass_0.2-2      MASS_7.3-56        ipred_0.9-12      
+[49] hms_1.1.1          promises_1.2.0.1   parallel_4.2.0     yaml_2.3.5        
+[53] sass_0.4.1         rpart_4.1.16       stringi_1.7.6      foreach_1.5.2     
+[57] lhs_1.1.5          hardhat_0.2.0      lava_1.6.10        rlang_1.0.4       
+[61] pkgconfig_2.0.3    evaluate_0.15      lattice_0.20-45    processx_3.5.3    
+[65] tidyselect_1.1.2   parallelly_1.31.1  plyr_1.8.7         magrittr_2.0.3    
+[69] R6_2.5.1           generics_0.1.2     DBI_1.1.2          pillar_1.7.0      
+[73] haven_2.5.0        whisker_0.4        withr_2.5.0        survival_3.3-1    
+[77] nnet_7.3-17        future.apply_1.9.0 modelr_0.1.8       crayon_1.5.1      
+[81] utf8_1.2.2         tzdb_0.3.0         rmarkdown_2.14     grid_4.2.0        
+[85] readxl_1.4.0       callr_3.7.0        git2r_0.30.1       reprex_2.0.1      
+[89] digest_0.6.29      httpuv_1.6.5       munsell_0.5.0      GPfit_1.0-8       
+[93] bslib_0.3.1       </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
