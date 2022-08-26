@@ -8,4 +8,14 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+The goal of this work was to create a model to predict pasture yield to help farmers . This model needed to be sensitive to inherent site properties such as soil as well as to management practices. 
+
+In order to accomplish this, we used data from the SSURGO database [USDA Web Soil Survey](https://websoilsurvey.sc.egov.usda.gov/App/HomePage.htm) to predict pasture yield potential based on soil properties and grass species.
+
+* [Download data](downloadData.html)
+* [Clean data](cleanData.html)
+* [Model creation](createModel.html)
+* [Model explainer](explore.html)
+
+ 
+    
